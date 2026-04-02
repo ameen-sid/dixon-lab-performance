@@ -7,6 +7,7 @@ type FunctionalTest = {
 	id: number;
 	productPartName: string;
 	companySupplier: string;
+	customer?: string | null;
 	productType: string;
 	testName: string;
 	isPass: boolean;
@@ -36,6 +37,8 @@ export default function FunctionalTestHistory() {
 	const [loading, setLoading] = useState(true);
 	const [search, setSearch] = useState("");
 	const [statusFilter, setStatusFilter] = useState<"ALL" | "PASS" | "FAIL">("ALL");
+	const [startDate, setStartDate] = useState("");
+	const [endDate, setEndDate] = useState("");
 	const [page, setPage] = useState(1);
 	const PER_PAGE = 8;
 
@@ -69,7 +72,13 @@ export default function FunctionalTestHistory() {
 				: statusFilter === "PASS"
 				? t.isPass
 				: !t.isPass;
-		return matchesSearch && matchesStatus;
+
+		const testDate = new Date(t.testStartDate);
+		const matchesDate = 
+			(!startDate || testDate >= new Date(startDate)) &&
+			(!endDate || testDate <= new Date(endDate + "T23:59:59"));
+
+		return matchesSearch && matchesStatus && matchesDate;
 	});
 
 	const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
@@ -188,6 +197,38 @@ export default function FunctionalTestHistory() {
 							</button>
 						))}
 					</div>
+
+					<div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-slate-200">
+						<div className="flex items-center gap-2">
+							<span className="text-[10px] font-bold text-slate-400 uppercase">From</span>
+							<input 
+								type="date" 
+								value={startDate} 
+								onChange={(e) => { setStartDate(e.target.value); setPage(1); }}
+								className="text-xs font-semibold text-slate-600 outline-none bg-transparent"
+							/>
+						</div>
+						<div className="w-px h-4 bg-slate-200 mx-1" />
+						<div className="flex items-center gap-2">
+							<span className="text-[10px] font-bold text-slate-400 uppercase">To</span>
+							<input 
+								type="date" 
+								value={endDate} 
+								onChange={(e) => { setEndDate(e.target.value); setPage(1); }}
+								className="text-xs font-semibold text-slate-600 outline-none bg-transparent"
+							/>
+						</div>
+						{(startDate || endDate) && (
+							<button 
+								onClick={() => { setStartDate(""); setEndDate(""); setPage(1); }}
+								className="ml-2 text-slate-400 hover:text-red-500 transition-colors"
+							>
+								<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+								</svg>
+							</button>
+						)}
+					</div>
 					<span className="ml-auto text-xs font-semibold text-slate-400 hidden sm:block">
 						Pass Rate: <span className="text-slate-700">{passRate}%</span>
 					</span>
@@ -201,6 +242,7 @@ export default function FunctionalTestHistory() {
 								<th className="px-6 py-4 font-bold border-b border-slate-200">#</th>
 								<th className="px-6 py-4 font-bold border-b border-slate-200">Part Name</th>
 								<th className="px-6 py-4 font-bold border-b border-slate-200">Supplier</th>
+								<th className="px-6 py-4 font-bold border-b border-slate-200">Customer</th>
 								<th className="px-6 py-4 font-bold border-b border-slate-200">Type</th>
 								<th className="px-6 py-4 font-bold border-b border-slate-200">Test</th>
 								<th className="px-6 py-4 font-bold border-b border-slate-200">Date</th>
@@ -245,6 +287,7 @@ export default function FunctionalTestHistory() {
 											<p className="text-sm font-bold text-slate-800">{test.productPartName}</p>
 										</td>
 										<td className="px-6 py-4 text-sm text-slate-600">{test.companySupplier}</td>
+										<td className="px-6 py-4 text-sm font-semibold text-blue-600">{test.customer || "-"}</td>
 										<td className="px-6 py-4">
 											<span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${TYPE_BADGE}`}>
 												{test.productType}

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
-type Supplier = { id: number; name: string };
+type Supplier = { id: number; name: string; customer?: string | null };
 type Protocol = { id: number; testName: string; testCondition: string; testMethod: string; judgementCriteria: string };
 
 const PRODUCT_TYPES = ["SATL", "FATL", "FAFL"];
@@ -21,6 +21,7 @@ export default function NewFunctionalTest() {
 	const [form, setForm] = useState({
 		productPartName: "",
 		companySupplier: "",
+		customer: "", // [cite: master data enhancement]
 		dateOfArrival: "",
 		batchSlNo: "",
 		productType: "",
@@ -41,6 +42,12 @@ export default function NewFunctionalTest() {
 
 	const [images, setImages] = useState<File[]>([]);
 	const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+	const [isCameraOpen, setIsCameraOpen] = useState(false);
+	const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
+
+	// Refs for camera and custom inputs
+	const videoRef = useRef<HTMLVideoElement>(null);
+	const canvasRef = useRef<HTMLCanvasElement>(null);
 
 	// "Other" free-text state
 	const [customProductType, setCustomProductType] = useState("");
@@ -77,9 +84,19 @@ export default function NewFunctionalTest() {
 		load();
 	}, []);
 
-	const set = (field: string, value: string) => {
+	const set = (field: string, value: any) => {
 		setForm((prev) => ({ ...prev, [field]: value }));
 		setError("");
+	};
+
+	const handleSupplierChange = (supplierName: string) => {
+		set("companySupplier", supplierName);
+		const supplier = suppliers.find((s) => s.name === supplierName);
+		if (supplier && supplier.customer) {
+			set("customer", supplier.customer);
+		} else {
+			set("customer", "");
+		}
 	};
 
 	// Auto-fill from protocol when test name selected
@@ -112,6 +129,56 @@ export default function NewFunctionalTest() {
 		const newFiles = images.filter((_, i) => i !== idx);
 		setImages(newFiles);
 		setImagePreviews(newFiles.map((f) => URL.createObjectURL(f)));
+	};
+
+	// --- Camera Functions ---
+	const openCamera = async () => {
+		try {
+			const stream = await navigator.mediaDevices.getUserMedia({
+				video: { facingMode: "environment", width: { ideal: 1920 }, height: { ideal: 1080 } },
+				audio: false,
+			});
+			setCameraStream(stream);
+			setIsCameraOpen(true);
+			if (videoRef.current) videoRef.current.srcObject = stream;
+		} catch (err) {
+			console.error("Camera access denied:", err);
+			setError("Camera access denied. Please check site permissions.");
+		}
+	};
+
+	const capturePhoto = () => {
+		if (videoRef.current && canvasRef.current) {
+			const video = videoRef.current;
+			const canvas = canvasRef.current;
+			canvas.width = video.videoWidth;
+			canvas.height = video.videoHeight;
+			const ctx = canvas.getContext("2d");
+			if (ctx) {
+				ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+				canvas.toBlob((blob) => {
+					if (blob) {
+						const file = new File([blob], `snap-${Date.now()}.jpg`, { type: "image/jpeg" });
+						if (images.length < 5) {
+							const newFiles = [...images, file];
+							setImages(newFiles);
+							setImagePreviews(newFiles.map((f) => URL.createObjectURL(f)));
+						} else {
+							setError("Maximum 5 images allowed.");
+						}
+						closeCamera();
+					}
+				}, "image/jpeg", 0.9);
+			}
+		}
+	};
+
+	const closeCamera = () => {
+		if (cameraStream) {
+			cameraStream.getTracks().forEach((track) => track.stop());
+		}
+		setCameraStream(null);
+		setIsCameraOpen(false);
 	};
 
 	const handleSubmit = async (e: React.FormEvent) => {
@@ -237,10 +304,14 @@ export default function NewFunctionalTest() {
 								</div>
 								<div>
 									<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Company / Supplier <span className="text-red-500">*</span></label>
-									<select value={form.companySupplier} onChange={(e) => set("companySupplier", e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm appearance-none">
+									<select value={form.companySupplier} onChange={(e) => handleSupplierChange(e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm appearance-none">
 										<option value="">Select supplier...</option>
 										{suppliers.map((s) => <option key={s.id} value={s.name}>{s.name}</option>)}
 									</select>
+								</div>
+								<div>
+									<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Customer</label>
+									<input type="text" value={form.customer} onChange={(e) => set("customer", e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm focus:bg-blue-50/50" placeholder="Auto-filled from supplier..." />
 								</div>
 								<div>
 									<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Date of Arrival <span className="text-red-500">*</span></label>
@@ -442,21 +513,34 @@ export default function NewFunctionalTest() {
 									</div>
 								</div>
 
-								{/* Image Upload */}
+								{/* Image Capture */}
 								<div>
 									<label className="block text-sm font-semibold text-slate-700 mb-3 ml-1">
 										Evidence Photos <span className="text-slate-400 font-normal">(up to 5)</span>
 									</label>
-									<label className="relative overflow-hidden border-2 border-dashed border-slate-300 rounded-xl p-5 flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 hover:border-blue-400 transition-all cursor-pointer group">
-										<input type="file" multiple accept="image/*" onChange={handleImageChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-										<div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-slate-400 group-hover:text-blue-500 mb-2">
-											<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+									<div>
+										<button
+											type="button"
+											onClick={openCamera}
+											className="w-full relative overflow-hidden border-2 border-dashed border-slate-300 rounded-2xl p-6 flex flex-col items-center justify-center bg-slate-50 hover:bg-blue-50/50 hover:border-blue-400 transition-all cursor-pointer group shadow-sm bg-gradient-to-b from-slate-50 to-white"
+										>
+											<div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-md text-slate-400 group-hover:text-blue-600 transition-all mb-3 group-hover:scale-110 border border-slate-100">
+												<svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+													<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812-1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+													<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+												</svg>
+											</div>
+											<p className="text-sm font-extrabold text-slate-800 tracking-tight">Snap Evidence Photo</p>
+											<p className="text-xs text-slate-400 mt-1 font-medium italic underline underline-offset-4 decoration-blue-200">opens camera viewfinder</p>
+										</button>
+										<p className="text-[10px] text-slate-400 mt-2 ml-1 flex items-center gap-1 font-semibold uppercase tracking-wider">
+											<svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
 											</svg>
-										</div>
-										<p className="text-sm font-medium text-slate-600">Click to upload photos</p>
-										<p className="text-xs text-slate-400 mt-0.5">PNG, JPG up to 10MB each</p>
-									</label>
+											Camera Optimized
+										</p>
+									</div>
+
 									{imagePreviews.length > 0 && (
 										<div className="grid grid-cols-3 gap-2 mt-3">
 											{imagePreviews.map((src, i) => (
@@ -505,6 +589,83 @@ export default function NewFunctionalTest() {
 					</div>
 				</div>
 			</form>
+
+			{isCameraOpen && (
+				<CameraOverlay
+					videoRef={videoRef}
+					stream={cameraStream}
+					onCapture={capturePhoto}
+					onClose={closeCamera}
+				/>
+			)}
+
+			<canvas ref={canvasRef} style={{ display: "none" }} />
+		</div>
+	);
+}
+
+// Camera Overlay Component
+function CameraOverlay({ videoRef, stream, onCapture, onClose }: { videoRef: any; stream: MediaStream | null; onCapture: () => void; onClose: () => void }) {
+	useEffect(() => {
+		if (videoRef.current && stream) {
+			videoRef.current.srcObject = stream;
+		}
+	}, [videoRef, stream]);
+
+	return (
+		<div className="fixed inset-0 z-[100] bg-black flex flex-col animate-in fade-in zoom-in-95 duration-300">
+			{/* Top Bar */}
+			<div className="absolute top-0 inset-x-0 p-6 flex justify-between items-center bg-gradient-to-b from-black/60 to-transparent z-10">
+				<div className="flex items-center gap-3">
+					<div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+					<span className="text-white font-bold tracking-widest text-xs uppercase">Live Viewfinder</span>
+				</div>
+				<button onClick={onClose} className="p-3 bg-white/10 hover:bg-white/20 rounded-full text-white backdrop-blur-md transition-all">
+					<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+					</svg>
+				</button>
+			</div>
+
+			{/* Viewfinder */}
+			<div className="flex-1 relative flex items-center justify-center overflow-hidden bg-slate-900">
+				{!stream && (
+					<div className="text-white text-center p-6">
+						<div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-4" />
+						<p className="text-sm font-medium opacity-60">Initializing camera...</p>
+					</div>
+				)}
+				<video
+					ref={videoRef}
+					autoPlay
+					playsInline
+					muted
+					className={`h-full w-full object-cover transition-opacity duration-700 ${stream ? "opacity-100" : "opacity-0"}`}
+				/>
+				{/* Crop Guide */}
+				<div className="absolute inset-0 border-[40px] border-black/20 pointer-events-none flex items-center justify-center">
+					<div className="w-full h-full border border-white/30 rounded-3xl" />
+				</div>
+			</div>
+
+			{/* Controls */}
+			<div className="p-10 bg-gradient-to-t from-black to-transparent flex justify-center items-center gap-12">
+				<button
+					onClick={onCapture}
+					disabled={!stream}
+					className="w-20 h-20 bg-white rounded-full p-1 shadow-2xl active:scale-95 transition-all outline outline-4 outline-white/20 outline-offset-4 group disabled:opacity-50 disabled:scale-90"
+				>
+					<div className="w-full h-full rounded-full border-2 border-black/5 flex items-center justify-center group-hover:bg-slate-50 transition-colors">
+						<svg className="w-10 h-10 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+						</svg>
+					</div>
+				</button>
+			</div>
+
+			{/* Invisible Canvas for Capture */}
+			<canvas id="hidden-capture-canvas" style={{ display: "none" }} />
 		</div>
 	);
 }

@@ -1,20 +1,34 @@
 import prisma from "@/src/lib/prisma";
 import Link from "next/link";
+import DateFilter from "@/src/components/dashboard/DateFilter";
+import { Suspense } from "react";
 
-async function getDashboardStats() {
+async function getDashboardStats(startDate?: string, endDate?: string) {
 	try {
+        const where: any = {};
+        if (startDate || endDate) {
+            where.createdAt = {};
+            if (startDate) where.createdAt.gte = new Date(startDate);
+            if (endDate) {
+                const end = new Date(endDate);
+                end.setHours(23, 59, 59, 999);
+                where.createdAt.lte = end;
+            }
+        }
+
 		const [totalFunctional, passedFunctional, failedFunctional, ongoingReliability, completedReliability] = await Promise.all([
-			prisma.functionalTest.count(),
-			prisma.functionalTest.count({ where: { isPass: true } }),
-			prisma.functionalTest.count({ where: { isPass: false } }),
-			prisma.reliabilityTest.count({ where: { status: "ONGOING" } }),
-			prisma.reliabilityTest.count({ where: { status: "COMPLETED" } }),
+			prisma.functionalTest.count({ where }),
+			prisma.functionalTest.count({ where: { ...where, isPass: true } }),
+			prisma.functionalTest.count({ where: { ...where, isPass: false } }),
+			prisma.reliabilityTest.count({ where: { ...where, status: "ONGOING" } }),
+			prisma.reliabilityTest.count({ where: { ...where, status: "COMPLETED" } }),
 		]);
 
 		const passRate = totalFunctional > 0 ? Math.round((passedFunctional / totalFunctional) * 100) : 0;
 
 		// Recent functional tests
 		const recentTests = await prisma.functionalTest.findMany({
+			where,
 			take: 5,
 			orderBy: { createdAt: "desc" },
 			select: {
@@ -28,7 +42,8 @@ async function getDashboardStats() {
 		});
 
 		return { totalFunctional, passedFunctional, failedFunctional, ongoingReliability, completedReliability, passRate, recentTests };
-	} catch {
+	} catch (e) {
+        console.error("Dashboard error:", e);
 		return { totalFunctional: 0, passedFunctional: 0, failedFunctional: 0, ongoingReliability: 0, completedReliability: 0, passRate: 0, recentTests: [] };
 	}
 }
@@ -37,13 +52,14 @@ function formatDate(d: Date) {
 	return new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
 }
 
-export default async function DashboardOverview() {
-	const stats = await getDashboardStats();
+export default async function DashboardOverview({ searchParams }: { searchParams: Promise<{ start?: string; end?: string }> }) {
+    const { start, end } = await searchParams;
+	const stats = await getDashboardStats(start, end);
 
 	return (
 		<div className="animate-in fade-in slide-in-from-bottom-4 duration-700 ease-in-out">
 			{/* Page Title */}
-			<div className="mb-8 flex justify-between items-end">
+			<div className="mb-6 flex justify-between items-start">
 				<div>
 					<h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
 						Welcome back, Admin
@@ -54,7 +70,7 @@ export default async function DashboardOverview() {
 				</div>
 				<Link
 					href="/reports/functional/new"
-					className="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl font-medium shadow-lg shadow-slate-900/20 transition-all flex items-center gap-2"
+					className="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl font-medium shadow-lg shadow-slate-900/20 transition-all flex items-center gap-2 transform active:scale-95"
 				>
 					<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -62,6 +78,11 @@ export default async function DashboardOverview() {
 					New Report
 				</Link>
 			</div>
+
+            {/* Date Selection */}
+            <Suspense fallback={<div className="h-20 bg-slate-50 rounded-2xl animate-pulse mb-8" />}>
+                <DateFilter />
+            </Suspense>
 
 			{/* Metric Cards Grid */}
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
@@ -81,7 +102,9 @@ export default async function DashboardOverview() {
 							</div>
 						</div>
 						<div className="mt-4 flex items-center gap-2 text-sm">
-							<span className="text-slate-600 font-bold bg-slate-50 px-2 py-1 rounded-md">All Time</span>
+							<span className="text-slate-600 font-bold bg-slate-50 px-2 py-1 rounded-md">
+                                {start || end ? "Filtered" : "All Time"}
+                            </span>
 							<span className="text-slate-400 font-medium">reports logged</span>
 						</div>
 					</div>

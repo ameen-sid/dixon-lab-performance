@@ -30,9 +30,13 @@ export default function UserManagementPage() {
 	const [users, setUsers] = useState<User[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [showModal, setShowModal] = useState(false);
+	const [showDeleteModal, setShowDeleteModal] = useState(false);
 	const [saving, setSaving] = useState(false);
+	const [deleting, setDeleting] = useState(false);
 	const [error, setError] = useState("");
 	const [success, setSuccess] = useState("");
+	const [editingUser, setEditingUser] = useState<User | null>(null);
+	const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
 	const [form, setForm] = useState({
 		name: "",
@@ -63,51 +67,95 @@ export default function UserManagementPage() {
 		setError("");
 	};
 
-	const openModal = () => {
-		setForm({ name: "", username: "", password: "", confirmPassword: "", role: "TECHNICIAN" });
+	const openModal = (user?: User) => {
+		if (user) {
+			setEditingUser(user);
+			setForm({
+				name: user.name,
+				username: user.username,
+				password: "",
+				confirmPassword: "",
+				role: user.role,
+			});
+		} else {
+			setEditingUser(null);
+			setForm({ name: "", username: "", password: "", confirmPassword: "", role: "TECHNICIAN" });
+		}
 		setError("");
 		setShowModal(true);
 	};
 
+	const openDeleteModal = (user: User) => {
+		setUserToDelete(user);
+		setShowDeleteModal(true);
+	};
+
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (!form.name || !form.username || !form.password) {
+		if (!form.name || !form.username || (!editingUser && !form.password)) {
 			setError("Name, username and password are required.");
 			return;
 		}
-		if (form.password !== form.confirmPassword) {
+		if (form.password && form.password !== form.confirmPassword) {
 			setError("Passwords do not match.");
 			return;
 		}
-		if (form.password.length < 6) {
+		if (form.password && form.password.length < 6) {
 			setError("Password must be at least 6 characters.");
 			return;
 		}
 		setSaving(true);
 		try {
-			const res = await fetch("/api/users", {
-				method: "POST",
+			const url = editingUser ? `/api/users/${editingUser.id}` : "/api/users";
+			const method = editingUser ? "PATCH" : "POST";
+
+			const res = await fetch(url, {
+				method,
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
 					name: form.name,
 					username: form.username,
-					password: form.password,
+					password: form.password || undefined,
 					role: form.role,
 				}),
 			});
 			if (res.ok) {
-				setSuccess("User created successfully!");
+				setSuccess(editingUser ? "User updated successfully!" : "User created successfully!");
 				setShowModal(false);
 				fetchUsers();
 				setTimeout(() => setSuccess(""), 2500);
 			} else {
 				const d = await res.json();
-				setError(d.error || "Failed to create user.");
+				setError(d.error || `Failed to ${editingUser ? "update" : "create"} user.`);
 			}
 		} catch {
 			setError("Network error. Please try again.");
 		} finally {
 			setSaving(false);
+		}
+	};
+
+	const handleDelete = async () => {
+		if (!userToDelete) return;
+		setDeleting(true);
+		try {
+			const res = await fetch(`/api/users/${userToDelete.id}`, {
+				method: "DELETE",
+			});
+			if (res.ok) {
+				setSuccess("User deleted successfully!");
+				setShowDeleteModal(false);
+				fetchUsers();
+				setTimeout(() => setSuccess(""), 2500);
+			} else {
+				const d = await res.json();
+				setError(d.error || "Failed to delete user.");
+			}
+		} catch {
+			setError("Network error. Please try again.");
+		} finally {
+			setDeleting(false);
+			setUserToDelete(null);
 		}
 	};
 
@@ -129,7 +177,7 @@ export default function UserManagementPage() {
 					</p>
 				</div>
 				<button
-					onClick={openModal}
+					onClick={() => openModal()}
 					className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-blue-500/30 transition-all flex items-center gap-2 transform hover:-translate-y-0.5"
 				>
 					<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -178,7 +226,8 @@ export default function UserManagementPage() {
 								<th className="px-6 py-4 font-bold border-b border-slate-200">Username</th>
 								<th className="px-6 py-4 font-bold border-b border-slate-200">Role</th>
 								<th className="px-6 py-4 font-bold border-b border-slate-200">Joined</th>
-								<th className="px-6 py-4 font-bold border-b border-slate-200 text-right">Status</th>
+								<th className="px-6 py-4 font-bold border-b border-slate-200">Status</th>
+								<th className="px-6 py-4 font-bold border-b border-slate-200 text-right">Actions</th>
 							</tr>
 						</thead>
 						<tbody className="divide-y divide-slate-100">
@@ -190,11 +239,14 @@ export default function UserManagementPage() {
 												<div className="h-4 bg-slate-100 rounded animate-pulse" />
 											</td>
 										))}
+										<td className="px-6 py-4">
+											<div className="h-8 w-16 bg-slate-100 rounded animate-pulse ml-auto" />
+										</td>
 									</tr>
 								))
 							) : users.length === 0 ? (
 								<tr>
-									<td colSpan={5} className="px-6 py-20 text-center">
+									<td colSpan={6} className="px-6 py-20 text-center">
 										<div className="flex flex-col items-center gap-3">
 											<div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-300">
 												<svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -223,11 +275,33 @@ export default function UserManagementPage() {
 											</span>
 										</td>
 										<td className="px-6 py-4 text-sm text-slate-500">{formatDate(user.createdAt)}</td>
-										<td className="px-6 py-4 text-right">
+										<td className="px-6 py-4">
 											<span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
 												<span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
 												Active
 											</span>
+										</td>
+										<td className="px-6 py-4 text-right">
+											<div className="flex justify-end gap-2">
+												<button
+													onClick={() => openModal(user)}
+													className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+													title="Edit User"
+												>
+													<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+														<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+													</svg>
+												</button>
+												<button
+													onClick={() => openDeleteModal(user)}
+													className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+													title="Delete User"
+												>
+													<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+														<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+													</svg>
+												</button>
+											</div>
 										</td>
 									</tr>
 								))
@@ -244,9 +318,9 @@ export default function UserManagementPage() {
 						<div className="bg-slate-900 px-8 py-5 flex justify-between items-center rounded-t-3xl">
 							<h3 className="text-white font-bold flex items-center gap-2">
 								<svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={editingUser ? "M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" : "M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"} />
 								</svg>
-								Create New User
+								{editingUser ? `Edit User: ${editingUser.name}` : "Create New User"}
 							</h3>
 							<button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-white transition-colors">
 								<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -293,7 +367,7 @@ export default function UserManagementPage() {
 								</div>
 								<div>
 									<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">
-										Password <span className="text-red-500">*</span>
+										Password {editingUser ? <span className="text-slate-400 text-xs font-normal">(Leave blank to keep current)</span> : <span className="text-red-500">*</span>}
 									</label>
 									<input
 										type="password"
@@ -305,7 +379,7 @@ export default function UserManagementPage() {
 								</div>
 								<div>
 									<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">
-										Confirm Password <span className="text-red-500">*</span>
+										Confirm Password {editingUser ? "" : <span className="text-red-500">*</span>}
 									</label>
 									<input
 										type="password"
@@ -347,11 +421,47 @@ export default function UserManagementPage() {
 								</button>
 								<button type="submit" disabled={saving} className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-slate-400 disabled:to-slate-400 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg shadow-blue-500/20 transition-all text-sm flex items-center gap-2">
 									{saving ? (
-										<><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Creating...</>
-									) : "Create User"}
+										<><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />{editingUser ? "Updating..." : "Creating..."}</>
+									) : (editingUser ? "Update User" : "Create User")}
 								</button>
 							</div>
 						</form>
+					</div>
+				</div>
+			)}
+
+			{/* Delete Confirmation Modal */}
+			{showDeleteModal && userToDelete && (
+				<div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+					<div className="bg-white rounded-3xl shadow-2xl w-full max-w-md animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
+						<div className="bg-rose-50 px-8 py-6 text-center">
+							<div className="w-16 h-16 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+								<svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+								</svg>
+							</div>
+							<h3 className="text-xl font-bold text-slate-900">Delete User?</h3>
+							<p className="text-slate-500 mt-2">
+								Are you sure you want to delete <span className="font-bold text-slate-700">{userToDelete.name}</span>? This action cannot be undone.
+							</p>
+						</div>
+						<div className="p-8 flex gap-3">
+							<button
+								onClick={() => setShowDeleteModal(false)}
+								className="flex-1 px-5 py-3 rounded-xl font-bold text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all text-sm"
+							>
+								Cancel
+							</button>
+							<button
+								onClick={handleDelete}
+								disabled={deleting}
+								className="flex-1 bg-rose-600 hover:bg-rose-700 disabled:bg-slate-400 text-white font-bold py-3 px-5 rounded-xl shadow-lg shadow-rose-500/20 transition-all text-sm flex items-center justify-center gap-2"
+							>
+								{deleting ? (
+									<><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Deleting...</>
+								) : "Delete User"}
+							</button>
+						</div>
 					</div>
 				</div>
 			)}

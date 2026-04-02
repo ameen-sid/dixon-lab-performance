@@ -9,6 +9,7 @@ export async function POST(req: Request) {
 		const newSupplier = await prisma.supplier.create({
 			data: {
 				name: body.name, // e.g., "Dixon", "IN HOUSE"
+				customer: body.customer, // [cite: added customer field]
 			},
 		});
 

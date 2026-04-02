@@ -38,6 +38,7 @@ model TestProtocol {
 model Supplier {
   id        Int      @id @default(autoincrement())
   name      String   @unique // e.g., "Dixon", "IN HOUSE"
+  customer  String?  // [cite: master data enhancement]
   createdAt DateTime @default(now())
 }
 
@@ -50,6 +51,7 @@ model FunctionalTest {
   // Basic Info
   productPartName   String   // [cite: 2]
   companySupplier   String   // [cite: 3]
+  customer          String?  // [cite: master data enhancement]
   dateOfArrival     DateTime // [cite: 4]
   batchSlNo         String   // [cite: 5]
   productType       String   // e.g., SATL, FATL, FAFL [cite: 6-9]

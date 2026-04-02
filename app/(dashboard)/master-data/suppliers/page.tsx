@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback } from "react";
 type Supplier = {
 	id: number;
 	name: string;
+	customer?: string | null;
 	createdAt: string;
 };
 
@@ -14,6 +15,7 @@ export default function SuppliersPage() {
 	const [showModal, setShowModal] = useState(false);
 	const [editTarget, setEditTarget] = useState<Supplier | null>(null);
 	const [nameInput, setNameInput] = useState("");
+	const [customerInput, setCustomerInput] = useState("");
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState("");
 	const [success, setSuccess] = useState("");
@@ -38,6 +40,7 @@ export default function SuppliersPage() {
 	const openAdd = () => {
 		setEditTarget(null);
 		setNameInput("");
+		setCustomerInput("");
 		setError("");
 		setShowModal(true);
 	};
@@ -45,6 +48,7 @@ export default function SuppliersPage() {
 	const openEdit = (s: Supplier) => {
 		setEditTarget(s);
 		setNameInput(s.name);
+		setCustomerInput(s.customer || "");
 		setError("");
 		setShowModal(true);
 	};
@@ -60,7 +64,10 @@ export default function SuppliersPage() {
 				{
 					method: editTarget ? "PUT" : "POST",
 					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ name: nameInput.trim() }),
+					body: JSON.stringify({
+						name: nameInput.trim(),
+						customer: customerInput.trim() || null,
+					}),
 				},
 			);
 			if (res.ok) {
@@ -162,7 +169,15 @@ export default function SuppliersPage() {
 								</div>
 								<div>
 									<p className="font-bold text-slate-900 text-base">{s.name}</p>
-									<p className="text-xs text-slate-400 mt-0.5">
+									{s.customer && (
+										<p className="text-sm font-semibold text-blue-600 flex items-center gap-1 mt-0.5">
+											<svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+											</svg>
+											{s.customer}
+										</p>
+									)}
+									<p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider font-bold">
 										Added {new Date(s.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
 									</p>
 								</div>
@@ -221,6 +236,18 @@ export default function SuppliersPage() {
 									autoFocus
 									className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
 									placeholder="e.g. IN HOUSE, Dixon Technologies"
+								/>
+							</div>
+							<div>
+								<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">
+									Customer Name
+								</label>
+								<input
+									type="text"
+									value={customerInput}
+									onChange={(e) => { setCustomerInput(e.target.value); setError(""); }}
+									className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm"
+									placeholder="e.g. SAMSUNG, LG, WHIRLPOOL"
 								/>
 							</div>
 							<div className="flex justify-end gap-3 pt-2">

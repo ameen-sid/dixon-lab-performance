@@ -11,6 +11,7 @@ type TestDetails = {
 	id: number;
 	productPartName: string;
 	companySupplier: string;
+	customer?: string | null;
 	dateOfArrival: string;
 	batchSlNo: string;
 	productType: string;
@@ -149,9 +150,10 @@ export default function FunctionalTestDetails({ params }: { params: Promise<{ id
 				{/* Basic Info */}
 				<div>
 					<SectionHeading num="1" title="Basic Information" />
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 						<DataField label="Part Name" value={test.productPartName} />
 						<DataField label="Supplier" value={test.companySupplier} />
+						<DataField label="Customer" value={test.customer || "-"} />
 						<DataField label="Date of Arrival" value={formatDate(test.dateOfArrival)} />
 						<DataField label="Batch / Serial No." value={test.batchSlNo} />
 						<DataField label="Model" value={test.model} />

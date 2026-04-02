@@ -13,7 +13,10 @@ export async function PUT(
 
 		const updated = await prisma.supplier.update({
 			where: { id: supplierId },
-			data: { name: body.name },
+			data: {
+				name: body.name,
+				customer: body.customer, // [cite: added customer field]
+			},
 		});
 
 		return NextResponse.json(updated, { status: 200 });
