@@ -124,7 +124,7 @@ model DailyLog {
   reliabilityTestId   Int
   reliabilityTest     ReliabilityTest @relation(fields: [reliabilityTestId], references: [id], onDelete: Cascade)
 
-  // Table Rows (The daily metrics)
+  // Table Rows (Expert Metrics)
   logDate             DateTime        // The specific date for this row
   noOfWashCycle       Int?
   noOfSpinCycle       Int?
@@ -134,6 +134,16 @@ model DailyLog {
   pulsator            String?
   washCurrentCycle    String?
   spinCurrentCycle    String?
+  
+  // New Excel Sheet Fields
+  cycleCount          Int?
+  pcb                 String?
+  feedValve           String?
+  washMotor           String?
+  clutch              String?
+  errorDetail         String?
+  otherIssues         String?
+
   remarks             String?         @db.Text
 
   createdAt           DateTime        @default(now())
