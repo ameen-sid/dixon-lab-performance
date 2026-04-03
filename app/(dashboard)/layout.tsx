@@ -48,9 +48,9 @@ export default function DashboardLayout({
 	};
 
 	return (
-		<div className="fixed inset-0 flex overflow-hidden bg-slate-50 font-sans selection:bg-blue-100 selection:text-blue-900">
+		<div className="fixed inset-0 flex overflow-hidden bg-slate-50 font-sans selection:bg-blue-100 selection:text-blue-900 print:relative print:block print:h-auto print:overflow-visible">
 			{/* Modern Dark Sidebar */}
-			<aside className="w-64 bg-slate-900 text-slate-300 flex flex-col shadow-2xl z-20 flex-shrink-0">
+			<aside className="w-64 bg-slate-900 text-slate-300 flex flex-col shadow-2xl z-20 flex-shrink-0 print:hidden">
 				{/* Brand Header */}
 				<div className="h-20 flex items-center px-6 border-b border-slate-800/60">
 					<div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center mr-3 shadow-lg shadow-blue-500/20 flex-shrink-0">
@@ -173,9 +173,9 @@ export default function DashboardLayout({
 			</aside>
 
 			{/* Main Content Area */}
-			<main className="flex-1 flex flex-col min-h-0 overflow-hidden">
+			<main className="flex-1 flex flex-col min-h-0 overflow-hidden print:block print:h-auto print:overflow-visible">
 				{/* Top Header */}
-				<header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 z-10 flex-shrink-0">
+				<header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 z-10 flex-shrink-0 print:hidden">
 					<PageTitle />
 					<div className="flex items-center gap-4">
 						<span className="bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-2">
@@ -186,7 +186,7 @@ export default function DashboardLayout({
 				</header>
 
 				{/* Scrollable Page Content */}
-				<div className="flex-1 overflow-y-auto p-8 bg-slate-50/50">
+				<div className="flex-1 overflow-y-auto p-8 bg-slate-50/50 print:p-0 print:bg-white print:overflow-visible">
 					<div className="max-w-7xl mx-auto">{children}</div>
 				</div>
 			</main>
