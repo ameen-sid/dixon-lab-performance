@@ -28,11 +28,20 @@ model User {
 model TestProtocol {
   id                Int      @id @default(autoincrement())
   testName          String   @unique // e.g., TR, CR, CD, BD, "Temperature rise test: Wash"
-  testCondition     String   @db.Text
+  productType       String   @default("SATL") // [cite: dependent dropdown enhancement]
+  testPurpose       String?  @db.Text 
   testMethod        String   @db.Text
   judgementCriteria String   @db.Text
+  testDuration      String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+}
+
+model ProductPart {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Supplier {
@@ -59,12 +68,11 @@ model FunctionalTest {
 
   // Test Specifics
   model             String?  // e.g., RIL, P1-UI-1.5,8.5kg [cite: 29-30]
-  samples           String?  // e.g., 1 sample [cite: 38-39]
+  samples           Int?     // Changed from String to Int [cite: 38-39]
   instrument        String?  // e.g., Power Meter, AC Power [cite: 43-44]
   testPurpose       String?  @db.Text // [cite: 45-46]
 
   // Protocol Data (Can be auto-filled from Master Data)
-  testCondition     String?  @db.Text // [cite: 36-37]
   testMethod        String   @db.Text // [cite: 20]
   judgementCriteria String   @db.Text // [cite: 21]
 

@@ -5,17 +5,21 @@ import { useState, useEffect, useCallback } from "react";
 type Protocol = {
 	id: number;
 	testName: string;
-	testCondition: string;
+	productType: string;
+	testPurpose: string;
 	testMethod: string;
 	judgementCriteria: string;
+	testDuration: string;
 	createdAt: string;
 };
 
 const EMPTY_FORM = {
 	testName: "",
-	testCondition: "",
+	productType: "SATL",
+	testPurpose: "",
 	testMethod: "",
 	judgementCriteria: "",
+	testDuration: "",
 };
 
 export default function ProtocolManagement() {
@@ -50,9 +54,27 @@ export default function ProtocolManagement() {
 
 	const openEdit = (p: Protocol) => {
 		setEditTarget(p);
-		setForm({ testName: p.testName, testCondition: p.testCondition, testMethod: p.testMethod, judgementCriteria: p.judgementCriteria });
+		setForm({
+			testName: p.testName,
+			productType: p.productType || "",
+			testPurpose: p.testPurpose || "",
+			testMethod: p.testMethod,
+			judgementCriteria: p.judgementCriteria,
+			testDuration: p.testDuration || "",
+		});
 		setError("");
 		setShowModal(true);
+	};
+
+	const toggleType = (type: string) => {
+		const current = form.productType.split(",").map(t => t.trim()).filter(Boolean);
+		let next;
+		if (current.includes(type)) {
+			next = current.filter(t => t !== type).join(", ");
+		} else {
+			next = [...current, type].join(", ");
+		}
+		set("productType", next);
 	};
 
 	const set = (field: string, value: string) => {
@@ -174,9 +196,16 @@ export default function ProtocolManagement() {
 									</div>
 									<div>
 										<h3 className="text-base font-bold text-slate-900">{p.testName}</h3>
-										<p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mt-0.5">
-											PRT-{String(p.id).padStart(3, "0")}
-										</p>
+										<div className="flex flex-wrap items-center gap-1.5 mt-1">
+											{(p.productType || "").split(",").map(type => type.trim()).filter(Boolean).map(t => (
+												<span key={t} className="text-[9px] font-bold bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded border border-blue-100">
+													{t}
+												</span>
+											))}
+											<p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider ml-1">
+												PRT-{String(p.id).padStart(3, "0")}
+											</p>
+										</div>
 									</div>
 								</div>
 								<div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -216,20 +245,26 @@ export default function ProtocolManagement() {
 							{/* Expanded Detail */}
 							{expandedId === p.id && (
 								<div className="mt-4 pt-4 border-t border-slate-100 space-y-3 relative z-10 animate-in fade-in duration-200">
-									{p.testCondition && (
+									{p.testPurpose && (
 										<div>
-											<p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">Test Condition</p>
-											<p className="text-sm text-slate-600 leading-relaxed">{p.testCondition}</p>
+											<p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">Test Purpose</p>
+											<p className="text-sm text-slate-600 leading-relaxed">{p.testPurpose}</p>
 										</div>
 									)}
 									<div>
-										<p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">Test Method</p>
+										<p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">Test Method / Condition</p>
 										<p className="text-sm text-slate-600 leading-relaxed">{p.testMethod || "—"}</p>
 									</div>
 									<div>
 										<p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">Judgement Criteria</p>
 										<p className="text-sm text-slate-600 leading-relaxed">{p.judgementCriteria}</p>
 									</div>
+									{p.testDuration && (
+										<div>
+											<p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">Duration</p>
+											<p className="text-sm text-slate-600 leading-relaxed">{p.testDuration}</p>
+										</div>
+									)}
 								</div>
 							)}
 						</div>
@@ -258,16 +293,44 @@ export default function ProtocolManagement() {
 							{error && (
 								<div className="bg-red-50 text-red-600 px-4 py-3 rounded-xl text-sm border border-red-100 font-medium">{error}</div>
 							)}
-							<div>
-								<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Test Name <span className="text-red-500">*</span></label>
-								<input type="text" value={form.testName} onChange={(e) => set("testName", e.target.value)} autoFocus className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm" placeholder="e.g. TR, Temperature rise test: Wash" />
+							<div className="grid grid-cols-2 gap-5">
+								<div>
+									<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Test Name <span className="text-red-500">*</span></label>
+									<input type="text" value={form.testName} onChange={(e) => set("testName", e.target.value)} autoFocus className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm" placeholder="e.g. TR, Temperature rise test: Wash" />
+								</div>
+								<div>
+									<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Duration</label>
+									<input type="text" value={form.testDuration} onChange={(e) => set("testDuration", e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm" placeholder="e.g. 4 Hours" />
+								</div>
 							</div>
 							<div>
-								<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Test Condition</label>
-								<textarea rows={3} value={form.testCondition} onChange={(e) => set("testCondition", e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm" placeholder="e.g. Keep Voltage 245V, 50Hz..." />
+								<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Product Type <span className="text-red-500">*</span></label>
+								<div className="grid grid-cols-3 gap-3">
+									{["SATL", "FATL", "FAFL"].map((type) => {
+										const isSelected = form.productType.split(",").map(t => t.trim()).includes(type);
+										return (
+											<button
+												key={type}
+												type="button"
+												onClick={() => toggleType(type)}
+												className={`py-2.5 rounded-xl text-xs font-bold transition-all border ${
+													isSelected
+														? "bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-500/20 scale-[1.02]"
+														: "bg-white border-slate-200 text-slate-500 hover:border-blue-300"
+												}`}
+											>
+												{isSelected && "✓ "}{type}
+											</button>
+										);
+									})}
+								</div>
 							</div>
 							<div>
-								<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Test Method <span className="text-red-500">*</span></label>
+								<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Test Purpose</label>
+								<textarea rows={3} value={form.testPurpose} onChange={(e) => set("testPurpose", e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm" placeholder="e.g. Verify thermal limits and structural integrity..." />
+							</div>
+							<div>
+								<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Test Method / Condition <span className="text-red-500">*</span></label>
 								<textarea rows={3} value={form.testMethod} onChange={(e) => set("testMethod", e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm" placeholder="e.g. Measure the contact resistance using..." />
 							</div>
 							<div>

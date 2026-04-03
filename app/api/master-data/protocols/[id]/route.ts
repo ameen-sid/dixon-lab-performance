@@ -15,9 +15,11 @@ export async function PUT(
 			where: { id: protocolId },
 			data: {
 				testName: body.testName,
-				testCondition: body.testCondition,
+				productType: body.productType,
+				testPurpose: body.testPurpose,
 				testMethod: body.testMethod,
 				judgementCriteria: body.judgementCriteria,
+				testDuration: body.testDuration,
 			},
 		});
 

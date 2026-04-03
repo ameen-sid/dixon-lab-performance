@@ -16,12 +16,22 @@ async function getDashboardStats(startDate?: string, endDate?: string) {
             }
         }
 
-		const [totalFunctional, passedFunctional, failedFunctional, ongoingReliability, completedReliability] = await Promise.all([
+		const [
+			totalFunctional, 
+			passedFunctional, 
+			failedFunctional, 
+			totalReliability,
+			ongoingReliability, 
+			completedReliability,
+			totalDailyLogs
+		] = await Promise.all([
 			prisma.functionalTest.count({ where }),
 			prisma.functionalTest.count({ where: { ...where, isPass: true } }),
 			prisma.functionalTest.count({ where: { ...where, isPass: false } }),
+			prisma.reliabilityTest.count({ where }),
 			prisma.reliabilityTest.count({ where: { ...where, status: "ONGOING" } }),
 			prisma.reliabilityTest.count({ where: { ...where, status: "COMPLETED" } }),
+			prisma.dailyLog.count({ where }),
 		]);
 
 		const passRate = totalFunctional > 0 ? Math.round((passedFunctional / totalFunctional) * 100) : 0;
@@ -41,10 +51,30 @@ async function getDashboardStats(startDate?: string, endDate?: string) {
 			},
 		});
 
-		return { totalFunctional, passedFunctional, failedFunctional, ongoingReliability, completedReliability, passRate, recentTests };
+		return { 
+			totalFunctional, 
+			passedFunctional, 
+			failedFunctional, 
+			totalReliability,
+			ongoingReliability, 
+			completedReliability, 
+			totalDailyLogs,
+			passRate, 
+			recentTests 
+		};
 	} catch (e) {
         console.error("Dashboard error:", e);
-		return { totalFunctional: 0, passedFunctional: 0, failedFunctional: 0, ongoingReliability: 0, completedReliability: 0, passRate: 0, recentTests: [] };
+		return { 
+			totalFunctional: 0, 
+			passedFunctional: 0, 
+			failedFunctional: 0, 
+			totalReliability: 0,
+			ongoingReliability: 0, 
+			completedReliability: 0, 
+			totalDailyLogs: 0,
+			passRate: 0, 
+			recentTests: [] 
+		};
 	}
 }
 
@@ -84,98 +114,195 @@ export default async function DashboardOverview({ searchParams }: { searchParams
                 <DateFilter />
             </Suspense>
 
-			{/* Metric Cards Grid */}
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
-				{/* Card 1: Total Tests */}
-				<div className="bg-white p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 relative overflow-hidden group hover:border-slate-200 hover:shadow-md transition-all">
-					<div className="absolute top-0 right-0 w-28 h-28 bg-slate-500/5 rounded-bl-full -z-0 group-hover:scale-110 transition-transform" />
-					<div className="relative z-10">
-						<div className="flex justify-between items-start">
-							<div>
-								<h3 className="text-slate-500 font-semibold text-sm mb-1">Total Functional Tests</h3>
-								<p className="text-4xl font-extrabold text-slate-900">{stats.totalFunctional}</p>
+			{/* ─── Functional Test Overview ─── */}
+			<div className="mb-6">
+				<h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+					<span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+					Functional Test Overview
+				</h4>
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+					{/* Total Functional */}
+					<div className="bg-white p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 relative overflow-hidden group hover:border-slate-200 hover:shadow-md transition-all">
+						<div className="absolute top-0 right-0 w-28 h-28 bg-slate-500/5 rounded-bl-full -z-0 group-hover:scale-110 transition-transform" />
+						<div className="relative z-10">
+							<div className="flex justify-between items-start">
+								<div>
+									<h3 className="text-slate-500 font-semibold text-[10px] uppercase tracking-wider mb-1">Total Functional</h3>
+									<p className="text-3xl font-extrabold text-slate-900">{stats.totalFunctional}</p>
+								</div>
+								<div className="w-10 h-10 bg-slate-50 text-slate-600 rounded-xl flex items-center justify-center flex-shrink-0">
+									<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+									</svg>
+								</div>
 							</div>
-							<div className="w-12 h-12 bg-slate-50 text-slate-600 rounded-2xl flex items-center justify-center flex-shrink-0">
-								<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-								</svg>
+							<div className="mt-4 flex items-center gap-2 text-xs">
+								<span className="text-slate-400 font-medium italic">inspection reports</span>
 							</div>
 						</div>
-						<div className="mt-4 flex items-center gap-2 text-sm">
-							<span className="text-slate-600 font-bold bg-slate-50 px-2 py-1 rounded-md">
-                                {start || end ? "Filtered" : "All Time"}
-                            </span>
-							<span className="text-slate-400 font-medium">reports logged</span>
+					</div>
+
+					{/* Passed Functional */}
+					<div className="bg-white p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 relative overflow-hidden group hover:border-slate-200 hover:shadow-md transition-all">
+						<div className="absolute top-0 right-0 w-28 h-28 bg-emerald-500/5 rounded-bl-full -z-0 group-hover:scale-110 transition-transform" />
+						<div className="relative z-10">
+							<div className="flex justify-between items-start">
+								<div>
+									<h3 className="text-slate-500 font-semibold text-[10px] uppercase tracking-wider mb-1">Passed Tests</h3>
+									<p className="text-3xl font-extrabold text-slate-900">{stats.passedFunctional}</p>
+								</div>
+								<div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center flex-shrink-0">
+									<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+									</svg>
+								</div>
+							</div>
+							<div className="mt-4 flex items-center gap-2 text-xs">
+								<span className="text-emerald-600 font-bold bg-emerald-50 px-2 py-1 rounded-md">{stats.passRate}% pass rate</span>
+							</div>
+						</div>
+					</div>
+
+					{/* Failed Functional */}
+					<div className="bg-white p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 relative overflow-hidden group hover:border-slate-200 hover:shadow-md transition-all">
+						<div className="absolute top-0 right-0 w-28 h-28 bg-red-500/5 rounded-bl-full -z-0 group-hover:scale-110 transition-transform" />
+						<div className="relative z-10">
+							<div className="flex justify-between items-start">
+								<div>
+									<h3 className="text-slate-500 font-semibold text-[10px] uppercase tracking-wider mb-1">Failed Tests</h3>
+									<p className="text-3xl font-extrabold text-slate-900">{stats.failedFunctional}</p>
+								</div>
+								<div className="w-10 h-10 bg-red-50 text-red-600 rounded-xl flex items-center justify-center flex-shrink-0">
+									<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+									</svg>
+								</div>
+							</div>
+							<div className="mt-4 flex items-center gap-2 text-xs">
+								<span className={`font-bold px-2 py-1 rounded-md ${stats.failedFunctional > 0 ? "text-red-600 bg-red-50" : "text-slate-500 bg-slate-50"}`}>
+									{stats.failedFunctional > 0 ? "Needs Review" : "All Clear"}
+								</span>
+							</div>
+						</div>
+					</div>
+
+					{/* Pass Rate Metric */}
+					<div className="bg-white p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 relative overflow-hidden group hover:border-slate-200 hover:shadow-md transition-all">
+						<div className="absolute top-0 right-0 w-28 h-28 bg-blue-500/5 rounded-bl-full -z-0 group-hover:scale-110 transition-transform" />
+						<div className="relative z-10">
+							<div className="flex justify-between items-start">
+								<div>
+									<h3 className="text-slate-500 font-semibold text-[10px] uppercase tracking-wider mb-1">Success Rating</h3>
+									<p className="text-3xl font-extrabold text-slate-900">{stats.passRate}%</p>
+								</div>
+								<div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+									<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+									</svg>
+								</div>
+							</div>
+							<div className="mt-4 flex items-center gap-2 text-xs">
+								<div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+									<div className="h-full bg-blue-500 rounded-full" style={{ width: `${stats.passRate}%` }} />
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
+			</div>
 
-				{/* Card 2: Pass Rate */}
-				<div className="bg-white p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 relative overflow-hidden group hover:border-slate-200 hover:shadow-md transition-all">
-					<div className="absolute top-0 right-0 w-28 h-28 bg-emerald-500/5 rounded-bl-full -z-0 group-hover:scale-110 transition-transform" />
-					<div className="relative z-10">
-						<div className="flex justify-between items-start">
-							<div>
-								<h3 className="text-slate-500 font-semibold text-sm mb-1">Passed Tests</h3>
-								<p className="text-4xl font-extrabold text-slate-900">{stats.passedFunctional}</p>
+			{/* ─── Reliability Test Overview ─── */}
+			<div className="mb-10">
+				<h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+					<span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+					Reliability Cycle Overview
+				</h4>
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+					{/* Total Reliability */}
+					<div className="bg-white p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 relative overflow-hidden group hover:border-slate-200 hover:shadow-md transition-all">
+						<div className="absolute top-0 right-0 w-28 h-28 bg-slate-500/5 rounded-bl-full -z-0 group-hover:scale-110 transition-transform" />
+						<div className="relative z-10">
+							<div className="flex justify-between items-start">
+								<div>
+									<h3 className="text-slate-500 font-semibold text-[10px] uppercase tracking-wider mb-1">Total Cycles</h3>
+									<p className="text-3xl font-extrabold text-slate-900">{stats.totalReliability}</p>
+								</div>
+								<div className="w-10 h-10 bg-slate-50 text-slate-600 rounded-xl flex items-center justify-center flex-shrink-0">
+									<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+									</svg>
+								</div>
 							</div>
-							<div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center flex-shrink-0">
-								<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-								</svg>
+							<div className="mt-4 flex items-center gap-2 text-xs">
+								<span className="text-slate-400 font-medium italic">total testing cycles</span>
 							</div>
-						</div>
-						<div className="mt-4 flex items-center gap-2 text-sm">
-							<span className="text-emerald-600 font-bold bg-emerald-50 px-2 py-1 rounded-md">{stats.passRate}%</span>
-							<span className="text-slate-400 font-medium">pass rate</span>
 						</div>
 					</div>
-				</div>
 
-				{/* Card 3: Failed */}
-				<div className="bg-white p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 relative overflow-hidden group hover:border-slate-200 hover:shadow-md transition-all">
-					<div className="absolute top-0 right-0 w-28 h-28 bg-red-500/5 rounded-bl-full -z-0 group-hover:scale-110 transition-transform" />
-					<div className="relative z-10">
-						<div className="flex justify-between items-start">
-							<div>
-								<h3 className="text-slate-500 font-semibold text-sm mb-1">Failed / Alert</h3>
-								<p className="text-4xl font-extrabold text-slate-900">{stats.failedFunctional}</p>
+					{/* Ongoing Reliability */}
+					<div className="bg-white p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 relative overflow-hidden group hover:border-slate-200 hover:shadow-md transition-all">
+						<div className="absolute top-0 right-0 w-28 h-28 bg-indigo-500/5 rounded-bl-full -z-0 group-hover:scale-110 transition-transform" />
+						<div className="relative z-10">
+							<div className="flex justify-between items-start">
+								<div>
+									<h3 className="text-slate-500 font-semibold text-[10px] uppercase tracking-wider mb-1">Active Cycles</h3>
+									<p className="text-3xl font-extrabold text-slate-900">{stats.ongoingReliability}</p>
+								</div>
+								<div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0">
+									<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+									</svg>
+								</div>
 							</div>
-							<div className="w-12 h-12 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center flex-shrink-0">
-								<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-								</svg>
+							<div className="mt-4 flex items-center gap-2 text-xs">
+								<span className="text-indigo-600 font-bold bg-indigo-50 px-2 py-1 rounded-md flex items-center gap-1">
+									<span className="w-1 h-1 bg-indigo-500 rounded-full animate-pulse" />
+									In Progress
+								</span>
 							</div>
-						</div>
-						<div className="mt-4 flex items-center gap-2 text-sm">
-							<span className={`font-bold px-2 py-1 rounded-md ${stats.failedFunctional > 0 ? "text-red-600 bg-red-50" : "text-slate-500 bg-slate-50"}`}>
-								{stats.failedFunctional > 0 ? "Requires Review" : "All Clear ✓"}
-							</span>
 						</div>
 					</div>
-				</div>
 
-				{/* Card 4: Active Cycles */}
-				<div className="bg-white p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 relative overflow-hidden group hover:border-slate-200 hover:shadow-md transition-all">
-					<div className="absolute top-0 right-0 w-28 h-28 bg-blue-500/5 rounded-bl-full -z-0 group-hover:scale-110 transition-transform" />
-					<div className="relative z-10">
-						<div className="flex justify-between items-start">
-							<div>
-								<h3 className="text-slate-500 font-semibold text-sm mb-1">Active Reliability Cycles</h3>
-								<p className="text-4xl font-extrabold text-slate-900">{stats.ongoingReliability}</p>
+					{/* Completed Reliability */}
+					<div className="bg-white p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 relative overflow-hidden group hover:border-slate-200 hover:shadow-md transition-all">
+						<div className="absolute top-0 right-0 w-28 h-28 bg-emerald-500/5 rounded-bl-full -z-0 group-hover:scale-110 transition-transform" />
+						<div className="relative z-10">
+							<div className="flex justify-between items-start">
+								<div>
+									<h3 className="text-slate-500 font-semibold text-[10px] uppercase tracking-wider mb-1">Completed</h3>
+									<p className="text-3xl font-extrabold text-slate-900">{stats.completedReliability}</p>
+								</div>
+								<div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center flex-shrink-0">
+									<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4" />
+									</svg>
+								</div>
 							</div>
-							<div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center flex-shrink-0">
-								<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-								</svg>
+							<div className="mt-4 flex items-center gap-2 text-xs">
+								<span className="text-emerald-600 font-bold bg-emerald-50 px-2 py-1 rounded-md">Cycle Finished</span>
 							</div>
 						</div>
-						<div className="mt-4 flex items-center gap-2 text-sm">
-							<span className="text-blue-600 font-bold bg-blue-50 px-2 py-1 rounded-md flex items-center gap-1">
-								<span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
-								Running
-							</span>
-							<span className="text-slate-400 font-medium">{stats.completedReliability} completed</span>
+					</div>
+
+					{/* Total Logs */}
+					<div className="bg-white p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 relative overflow-hidden group hover:border-slate-200 hover:shadow-md transition-all">
+						<div className="absolute top-0 right-0 w-28 h-28 bg-violet-500/5 rounded-bl-full -z-0 group-hover:scale-110 transition-transform" />
+						<div className="relative z-10">
+							<div className="flex justify-between items-start">
+								<div>
+									<h3 className="text-slate-500 font-semibold text-[10px] uppercase tracking-wider mb-1">Total Effort</h3>
+									<p className="text-3xl font-extrabold text-slate-900">{stats.totalDailyLogs}</p>
+								</div>
+								<div className="w-10 h-10 bg-violet-50 text-violet-600 rounded-xl flex items-center justify-center flex-shrink-0">
+									<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+									</svg>
+								</div>
+							</div>
+							<div className="mt-4 flex items-center gap-2 text-xs">
+								<span className="text-slate-400 font-medium italic">daily logs recorded</span>
+							</div>
 						</div>
 					</div>
 				</div>

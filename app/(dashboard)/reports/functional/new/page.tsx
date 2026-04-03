@@ -4,10 +4,10 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 type Supplier = { id: number; name: string; customer?: string | null };
-type Protocol = { id: number; testName: string; testCondition: string; testMethod: string; judgementCriteria: string };
+type Product = { id: number; name: string };
+type Protocol = { id: number; testName: string; productType: string; testPurpose: string; testMethod: string; judgementCriteria: string; testDuration: string };
 
 const PRODUCT_TYPES = ["SATL", "FATL", "FAFL"];
-const TEST_NAMES = ["TR", "CR", "CD", "BD"];
 
 export default function NewFunctionalTest() {
 	const router = useRouter();
@@ -15,6 +15,7 @@ export default function NewFunctionalTest() {
 	const [error, setError] = useState("");
 	const [success, setSuccess] = useState(false);
 	const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+	const [products, setProducts] = useState<Product[]>([]);
 	const [protocols, setProtocols] = useState<Protocol[]>([]);
 
 	// Form state
@@ -30,7 +31,6 @@ export default function NewFunctionalTest() {
 		samples: "",
 		instrument: "",
 		testPurpose: "",
-		testCondition: "",
 		testMethod: "",
 		judgementCriteria: "",
 		testObservation: "",
@@ -73,12 +73,14 @@ export default function NewFunctionalTest() {
 	useEffect(() => {
 		const load = async () => {
 			try {
-				const [suppRes, protoRes] = await Promise.all([
+				const [suppRes, protoRes, prodRes] = await Promise.all([
 					fetch("/api/master-data/suppliers"),
 					fetch("/api/master-data/protocols"),
+					fetch("/api/master-data/products"),
 				]);
 				if (suppRes.ok) setSuppliers(await suppRes.json());
 				if (protoRes.ok) setProtocols(await protoRes.json());
+				if (prodRes.ok) setProducts(await prodRes.json());
 			} catch { /* silently fail */ }
 		};
 		load();
@@ -102,14 +104,18 @@ export default function NewFunctionalTest() {
 	// Auto-fill from protocol when test name selected
 	const handleTestNameSelect = (name: string) => {
 		set("testName", name);
-		const proto = protocols.find((p) => p.testName === name || p.testName.startsWith(name));
+		const proto = protocols.find((p) =>
+			(p.testName === name || p.testName.startsWith(name)) &&
+			(p.productType || "").split(",").map(t => t.trim()).includes(form.productType),
+		);
 		if (proto) {
 			setForm((prev) => ({
 				...prev,
 				testName: name,
-				testCondition: proto.testCondition || prev.testCondition,
+				testPurpose: proto.testPurpose || prev.testPurpose,
 				testMethod: proto.testMethod || prev.testMethod,
 				judgementCriteria: proto.judgementCriteria || prev.judgementCriteria,
+				testDuration: proto.testDuration || prev.testDuration,
 			}));
 		}
 	};
@@ -300,7 +306,10 @@ export default function NewFunctionalTest() {
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 								<div>
 									<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Product / Part Name <span className="text-red-500">*</span></label>
-									<input type="text" value={form.productPartName} onChange={(e) => set("productPartName", e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm" placeholder="e.g. MODIFIED TUB AT CLASP AREA" />
+									<select value={form.productPartName} onChange={(e) => set("productPartName", e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm appearance-none">
+										<option value="">Select product / part...</option>
+										{products.map((p) => <option key={p.id} value={p.name}>{p.name}</option>)}
+									</select>
 								</div>
 								<div>
 									<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Company / Supplier <span className="text-red-500">*</span></label>
@@ -327,7 +336,7 @@ export default function NewFunctionalTest() {
 								</div>
 								<div>
 									<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Samples</label>
-									<input type="text" value={form.samples} onChange={(e) => set("samples", e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm" placeholder="e.g. 1 sample" />
+									<input type="number" min="0" value={form.samples} onChange={(e) => set("samples", e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm" placeholder="e.g. 1" />
 								</div>
 							</div>
 						</div>
@@ -377,24 +386,30 @@ export default function NewFunctionalTest() {
 								</div>
 								<div>
 									<label className="block text-sm font-semibold text-slate-700 mb-3 ml-1">Name of Test <span className="text-red-500">*</span></label>
-									<div className="flex flex-wrap gap-2">
-										{TEST_NAMES.map((test) => (
-											<label key={test} className="relative cursor-pointer">
-												<input type="radio" name="testName" value={test} checked={form.testName === test} onChange={() => { handleTestNameSelect(test); setCustomTestName(""); }} className="peer absolute opacity-0 w-0 h-0" />
-												<div className="px-4 py-2.5 border border-slate-200 rounded-xl peer-checked:bg-indigo-50 peer-checked:border-indigo-500 peer-checked:text-indigo-700 font-bold text-slate-400 transition-all hover:bg-slate-50 text-sm">
-													{test}
+									{!form.productType ? (
+										<p className="text-xs text-slate-400 italic mt-2 ml-1">Please select Product Type first...</p>
+									) : (
+										<div className="flex flex-wrap gap-2">
+											{protocols
+												.filter((p) => (p.productType || "").split(",").map(t => t.trim()).includes(form.productType))
+												.map((p) => (
+													<label key={p.id} className="relative cursor-pointer">
+														<input type="radio" name="testName" value={p.testName} checked={form.testName === p.testName} onChange={() => { handleTestNameSelect(p.testName); setCustomTestName(""); }} className="peer absolute opacity-0 w-0 h-0" />
+														<div className="px-4 py-2.5 border border-slate-200 rounded-xl peer-checked:bg-indigo-50 peer-checked:border-indigo-500 peer-checked:text-indigo-700 font-bold text-slate-400 transition-all hover:bg-slate-50 text-sm">
+															{p.testName}
+														</div>
+													</label>
+												))}
+											{/* Other option */}
+											<label className="relative cursor-pointer">
+												<input type="radio" name="testName" value="OTHER" checked={form.testName === "OTHER"} onChange={() => { set("testName", "OTHER"); setCustomTestName(""); }} className="peer absolute opacity-0 w-0 h-0" />
+												<div className="px-4 py-2.5 border border-slate-200 rounded-xl peer-checked:bg-amber-50 peer-checked:border-amber-500 peer-checked:text-amber-700 font-bold text-slate-400 transition-all hover:bg-slate-50 text-sm flex items-center gap-1.5">
+													<svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
+													Other
 												</div>
 											</label>
-										))}
-										{/* Other option */}
-										<label className="relative cursor-pointer">
-											<input type="radio" name="testName" value="OTHER" checked={form.testName === "OTHER"} onChange={() => { set("testName", "OTHER"); setCustomTestName(""); }} className="peer absolute opacity-0 w-0 h-0" />
-											<div className="px-4 py-2.5 border border-slate-200 rounded-xl peer-checked:bg-amber-50 peer-checked:border-amber-500 peer-checked:text-amber-700 font-bold text-slate-400 transition-all hover:bg-slate-50 text-sm flex items-center gap-1.5">
-												<svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
-												Other
-											</div>
-										</label>
-									</div>
+										</div>
+									)}
 									{/* Reveal custom input when Other selected */}
 									{form.testName === "OTHER" && (
 										<div className="mt-3 animate-in fade-in slide-in-from-top-1 duration-200">
@@ -433,10 +448,10 @@ export default function NewFunctionalTest() {
 								</div>
 								<div>
 									<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">
-										Test Condition
+										Test Purpose
 										{form.testName && <span className="ml-2 text-xs text-blue-500 font-medium">(auto-filled from protocol)</span>}
 									</label>
-									<textarea rows={3} value={form.testCondition} onChange={(e) => set("testCondition", e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm" placeholder="e.g. Keep Voltage 245V, 50Hz..." />
+									<textarea rows={3} value={form.testPurpose} onChange={(e) => set("testPurpose", e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm" placeholder="e.g. Verify structural integrity..." />
 								</div>
 								<div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 									<div>

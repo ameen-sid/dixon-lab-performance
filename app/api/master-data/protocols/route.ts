@@ -8,10 +8,12 @@ export async function POST(req: Request) {
 
 		const newProtocol = await prisma.testProtocol.create({
 			data: {
-				testName: body.testName, // e.g., "Temperature rise test: Wash"
-				testCondition: body.testCondition, // e.g., "Keep Voltage 245 V, 50 Hz..."
-				testMethod: body.testMethod, // e.g., "Measure the Contact Resistance..."
-				judgementCriteria: body.judgementCriteria, // e.g., "Max temp rise allowed 75 Deg C"
+				testName: body.testName,
+				productType: body.productType || "SATL",
+				testPurpose: body.testPurpose,
+				testMethod: body.testMethod,
+				judgementCriteria: body.judgementCriteria,
+				testDuration: body.testDuration,
 			},
 		});
 
