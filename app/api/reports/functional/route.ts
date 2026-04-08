@@ -16,6 +16,7 @@ export async function POST(req: Request) {
 				batchSlNo: body.batchSlNo,
 				productType: body.productType,
 				testName: body.testName,
+				testCategory: body.testCategory,
 				model: body.model,
 				samples: body.samples ? parseInt(body.samples, 10) : null,
 				instrument: body.instrument,

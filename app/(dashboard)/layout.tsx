@@ -113,6 +113,12 @@ export default function DashboardLayout({
 						</svg>
 						Start New Cycle
 					</NavLink>
+					<NavLink href="/reliability-availability">
+						<svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+						</svg>
+						Platform Availability
+					</NavLink>
 
 					{/* Configuration */}
 					<p className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 mt-6">
@@ -128,13 +134,31 @@ export default function DashboardLayout({
 						<svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
 						</svg>
-						Suppliers
+						Supplier / Customer Management
+					</NavLink>
+					<NavLink href="/master-data/departments">
+						<svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+						</svg>
+						Department Management
 					</NavLink>
 					<NavLink href="/master-data/products">
 						<svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
 						</svg>
 						Product / Part Names
+					</NavLink>
+					<NavLink href="/master-data/testing-equipment">
+						<svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+						</svg>
+						R&D Testing Equipment
+					</NavLink>
+					<NavLink href="/master-data/test-categories">
+						<svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+						</svg>
+						Test Categories
 					</NavLink>
 					<NavLink href="/master-data/users">
 						<svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -203,9 +227,13 @@ function PageTitle() {
 		"/reports/functional": "Functional Test History",
 		"/reports/reliability": "Reliability Cycles",
 		"/reports/reliability/new": "Start New Cycle",
+		"/reliability-availability": "Platform Availability",
 		"/master-data/protocols": "Test Protocols",
-		"/master-data/suppliers": "Suppliers",
+		"/master-data/suppliers": "Supplier / Customer Management",
+		"/master-data/departments": "Department Management",
 		"/master-data/products": "Product / Part Names",
+		"/master-data/testing-equipment": "R&D Testing Equipment",
+		"/master-data/test-categories": "Test Category Management",
 		"/master-data/users": "User Management",
 	};
 

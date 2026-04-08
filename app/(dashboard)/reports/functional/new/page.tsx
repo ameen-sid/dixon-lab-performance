@@ -17,6 +17,7 @@ export default function NewFunctionalTest() {
 	const [suppliers, setSuppliers] = useState<Supplier[]>([]);
 	const [products, setProducts] = useState<Product[]>([]);
 	const [protocols, setProtocols] = useState<Protocol[]>([]);
+	const [testCategories, setTestCategories] = useState<{ id: number; name: string }[]>([]);
 
 	// Form state
 	const [form, setForm] = useState({
@@ -27,6 +28,7 @@ export default function NewFunctionalTest() {
 		batchSlNo: "",
 		productType: "",
 		testName: "",
+		testCategory: "",
 		model: "",
 		samples: "",
 		instrument: "",
@@ -73,14 +75,16 @@ export default function NewFunctionalTest() {
 	useEffect(() => {
 		const load = async () => {
 			try {
-				const [suppRes, protoRes, prodRes] = await Promise.all([
+				const [suppRes, protoRes, prodRes, catRes] = await Promise.all([
 					fetch("/api/master-data/suppliers"),
 					fetch("/api/master-data/protocols"),
 					fetch("/api/master-data/products"),
+					fetch("/api/master-data/test-categories"),
 				]);
 				if (suppRes.ok) setSuppliers(await suppRes.json());
 				if (protoRes.ok) setProtocols(await protoRes.json());
 				if (prodRes.ok) setProducts(await prodRes.json());
+				if (catRes.ok) setTestCategories(await catRes.json());
 			} catch { /* silently fail */ }
 		};
 		load();
@@ -349,6 +353,17 @@ export default function NewFunctionalTest() {
 								<span className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-black">2</span>
 								Categorization
 							</h4>
+							<div className="mb-6">
+								<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Test Category <span className="text-red-500">*</span></label>
+								<select 
+									value={form.testCategory} 
+									onChange={(e) => set("testCategory", e.target.value)} 
+									className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm font-semibold appearance-none"
+								>
+									<option value="">Select Category...</option>
+									{testCategories.map((c) => <option key={c.id} value={c.name}>{c.name}</option>)}
+								</select>
+							</div>
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 								<div>
 									<label className="block text-sm font-semibold text-slate-700 mb-3 ml-1">Product Type <span className="text-red-500">*</span></label>

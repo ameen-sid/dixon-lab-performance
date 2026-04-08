@@ -12,12 +12,23 @@ datasource db {
 // 4. USER & AUTHENTICATION
 // ==========================================
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  username  String   @unique  // Changed from email to username
-  password  String   // Hashed password
-  role      String   @default("TECHNICIAN")
+  id           Int         @id @default(autoincrement())
+  name         String
+  username     String      @unique // Changed from email to username
+  password     String      // Hashed password
+  role         String      @default("TECHNICIAN")
 
+  departmentId Int?
+  department   Department? @relation(fields: [departmentId], references: [id])
+
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model Department {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  users     User[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -40,14 +51,14 @@ model TestProtocol {
 model ProductPart {
   id        Int      @id @default(autoincrement())
   name      String   @unique
+  partNo    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Supplier {
   id        Int      @id @default(autoincrement())
-  name      String   @unique // e.g., "Dixon", "IN HOUSE"
-  customer  String?  // [cite: master data enhancement]
+  name      String   @unique // e.g., "Dixon", "SAMSUNG", "IN HOUSE"
   createdAt DateTime @default(now())
 }
 
@@ -65,6 +76,7 @@ model FunctionalTest {
   batchSlNo         String   // [cite: 5]
   productType       String   // e.g., SATL, FATL, FAFL [cite: 6-9]
   testName          String   // e.g., TR, CR, CD, BD [cite: 11-15]
+  testCategory      String?  
 
   // Test Specifics
   model             String?  // e.g., RIL, P1-UI-1.5,8.5kg [cite: 29-30]
@@ -105,18 +117,46 @@ model ReliabilityTest {
   id          Int      @id @default(autoincrement())
 
   // Header Data
-  modelCap    String   // e.g., T2
-  partName    String   // e.g., MODIFIED TUB AT CLASP AREA
-  vendor      String   // e.g., IN HOUSE
-  clothLoad   String   // e.g., UNBALANCED LOAD
-  startDate   DateTime
+  partName          String
+  partNo            String?
+  customerSupplier  String?
+  testPurpose       String?  @db.Text
+  sampleQuantity    Int?
+  testEquipment     String?
+  startDate         DateTime
+  endDate           DateTime?
+  reportIssueDate   DateTime?
+  calibrationDueDate DateTime?
+  ambientTempHumidity String?
+  testPlace         String?
+  standard          String?
+  testMethod        String?  @db.Text
+  judgementCriteria String?  @db.Text
+  productType       String?
+  nameOfTest        String?
+  
+  // Legacy/Backwards Compatibility
+  modelCap    String?   // Optional for compatibility
+  vendor      String?   // Optional for compatibility
+  clothLoad   String?   // Optional for compatibility
+  
   status      String   @default("ONGOING") // e.g., ONGOING, COMPLETED
 
   // Relationships
   dailyLogs   DailyLog[]
+  stations    Station[]
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Station {
+  id          String   @id // e.g., "P1-S1"
+  platformId  String   // e.g., "P1"
+  status      String   @default("AVAILABLE") // AVAILABLE, OCCUPIED
+  
+  reliabilityTestId Int?
+  reliabilityTest   ReliabilityTest? @relation(fields: [reliabilityTestId], references: [id])
 }
 
 model DailyLog {
@@ -150,4 +190,30 @@ model DailyLog {
   updatedAt           DateTime        @updatedAt
 
   @@unique([reliabilityTestId, logDate]) // Ensures only one log per day per test
+}
+
+// ==========================================
+// 5. R&D TESTING EQUIPMENT
+// ==========================================
+model TestingEquipment {
+  id                 Int      @id @default(autoincrement())
+  slNo               Int?     // Corresponding to user provided serial numbers
+  name               String   @unique
+  calibrationDueDate DateTime?
+  
+  status             String   @default("ACTIVE") // ACTIVE, OUT_OF_CALIBRATION, MAINTENANCE
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+// ==========================================
+// 6. TEST CATEGORY MANAGEMENT
+// ==========================================
+model TestCategory {
+  id                 Int      @id @default(autoincrement())
+  slNo               Int?
+  name               String   @unique
+  
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 }

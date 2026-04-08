@@ -15,7 +15,6 @@ export async function PUT(
 			where: { id: supplierId },
 			data: {
 				name: body.name,
-				customer: body.customer, // [cite: added customer field]
 			},
 		});
 

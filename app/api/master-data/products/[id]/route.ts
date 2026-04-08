@@ -4,11 +4,14 @@ import prisma from "@/src/lib/prisma";
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
 		const { id } = await params;
-		const { name } = await req.json();
+		const { name, partNo } = await req.json();
 
 		const updatedProduct = await prisma.productPart.update({
 			where: { id: parseInt(id) },
-			data: { name },
+			data: { 
+				name,
+				partNo: partNo || null
+			},
 		});
 		return NextResponse.json(updatedProduct);
 	} catch (error: any) {

@@ -15,11 +15,14 @@ export async function GET() {
 
 export async function POST(req: Request) {
 	try {
-		const { name } = await req.json();
+		const { name, partNo } = await req.json();
 		if (!name) return NextResponse.json({ error: "Name is required" }, { status: 400 });
 
 		const newProduct = await prisma.productPart.create({
-			data: { name },
+			data: { 
+				name,
+				partNo: partNo || null
+			},
 		});
 		return NextResponse.json(newProduct, { status: 201 });
 	} catch (error: any) {

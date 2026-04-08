@@ -6,11 +6,19 @@ import prisma from "@/src/lib/prisma";
 export async function POST(req: Request) {
 	try {
 		const body = await req.json();
-		const { name, username, password, role } = body;
+		const { name, username, password, role, departmentId } = body;
 
 		if (!username || !password || !name) {
 			return NextResponse.json(
 				{ error: "Missing required fields: name, username, and password are required." },
+				{ status: 400 },
+			);
+		}
+
+		// Validation: Roles other than SUPER_ADMIN must have a department
+		if (role !== "SUPER_ADMIN" && !departmentId) {
+			return NextResponse.json(
+				{ error: `Users with the '${role}' role must be assigned to a department.` },
 				{ status: 400 },
 			);
 		}
@@ -25,7 +33,8 @@ export async function POST(req: Request) {
 				name,
 				username,
 				password: hashedPassword,
-				role: role || "TECHNICIAN",
+				role: role || "OPERATOR", // Default to OPERATOR
+				departmentId: departmentId ? parseInt(departmentId) : null,
 			},
 		});
 
@@ -50,7 +59,7 @@ export async function POST(req: Request) {
 
 export async function GET() {
 	try {
-		// Fetch all users but EXCLUDE their hashed passwords
+		// Fetch all users with their departments
 		const users = await prisma.user.findMany({
 			select: {
 				id: true,
@@ -58,6 +67,12 @@ export async function GET() {
 				username: true,
 				role: true,
 				createdAt: true,
+				departmentId: true,
+				department: {
+					select: {
+						name: true
+					}
+				}
 			},
 			orderBy: { createdAt: "desc" },
 		});
