@@ -10,7 +10,6 @@ type TestDetails = {
 	id: number;
 	productPartName: string;
 	companySupplier: string;
-	customer?: string | null;
 	dateOfArrival: string;
 	batchSlNo: string;
 	productType: string;

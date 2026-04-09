@@ -194,6 +194,8 @@ export default function UserManagementPage() {
 			year: "numeric",
 		});
 
+	const hasSuperAdmin = users.some(u => u.role === "SUPER_ADMIN");
+
 	return (
 		<div className="max-w-6xl mx-auto pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
 			{/* Header */}
@@ -369,7 +371,15 @@ export default function UserManagementPage() {
 								<div>
 									<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Access Role <span className="text-red-500">*</span></label>
 									<select value={form.role} onChange={(e) => handleChange("role", e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm">
-										{ROLES.map(r => <option key={r} value={r}>{r}</option>)}
+										{ROLES.map(r => (
+											<option 
+												key={r} 
+												value={r} 
+												disabled={r === "SUPER_ADMIN" && hasSuperAdmin && editingUser?.role !== "SUPER_ADMIN"}
+											>
+												{r} {r === "SUPER_ADMIN" && hasSuperAdmin && editingUser?.role !== "SUPER_ADMIN" ? "(Only one allowed)" : ""}
+											</option>
+										))}
 									</select>
 								</div>
 								<div>

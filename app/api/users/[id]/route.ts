@@ -34,6 +34,22 @@ export async function PATCH(
 			}
 		}
 
+		// Validation: Only one SUPER_ADMIN allowed in the system
+		if (role === "SUPER_ADMIN") {
+			const existingSuperAdmin = await prisma.user.findFirst({
+				where: { 
+					role: "SUPER_ADMIN",
+					id: { not: id }
+				},
+			});
+			if (existingSuperAdmin) {
+				return NextResponse.json(
+					{ error: "A Super Admin already exists. Cannot assign role to another user." },
+					{ status: 400 },
+				);
+			}
+		}
+
 		// Build data object for update
 		const updateData: any = {};
 		if (name) updateData.name = name;

@@ -19,11 +19,10 @@ function NavLink({
 	return (
 		<Link
 			href={href}
-			className={`flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium transition-all text-sm ${
-				isActive
-					? "bg-blue-600/15 text-blue-400 shadow-inner"
-					: "hover:bg-slate-800/50 hover:text-white text-slate-400"
-			}`}
+			className={`flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium transition-all text-sm ${isActive
+				? "bg-blue-600/15 text-blue-400 shadow-inner"
+				: "hover:bg-slate-800/50 hover:text-white text-slate-400"
+				}`}
 		>
 			{children}
 		</Link>
@@ -59,9 +58,9 @@ export default function DashboardLayout({
 						</svg>
 					</div>
 					<div>
-						<h1 className="text-base font-bold text-white tracking-wide">DIXON QA</h1>
+						<h1 className="text-base font-bold text-white tracking-wide">DIXON</h1>
 						<p className="text-[10px] text-blue-400 font-semibold tracking-wider uppercase">
-							Reliability Portal
+							Portal
 						</p>
 					</div>
 				</div>
@@ -81,13 +80,13 @@ export default function DashboardLayout({
 
 					{/* Functional Tests */}
 					<p className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 mt-6">
-						Functional Tests
+						Tests
 					</p>
 					<NavLink href="/reports/functional/new">
 						<svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
 						</svg>
-						New Functional Test
+						New Test
 					</NavLink>
 					<NavLink href="/reports/functional" exact>
 						<svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -100,18 +99,18 @@ export default function DashboardLayout({
 					<p className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 mt-6">
 						Reliability
 					</p>
-					<NavLink href="/reports/reliability" exact>
-						<svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-						</svg>
-						Reliability Cycles
-					</NavLink>
 					<NavLink href="/reports/reliability/new">
 						<svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
 						</svg>
 						Start New Cycle
+					</NavLink>
+					<NavLink href="/reports/reliability" exact>
+						<svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+						</svg>
+						Reliability Cycles
 					</NavLink>
 					<NavLink href="/reliability-availability">
 						<svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -124,23 +123,17 @@ export default function DashboardLayout({
 					<p className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 mt-6">
 						Configuration
 					</p>
+					<NavLink href="/master-data/test-categories">
+						<svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+						</svg>
+						Test Categories
+					</NavLink>
 					<NavLink href="/master-data/protocols">
 						<svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
 						</svg>
 						Test Protocols
-					</NavLink>
-					<NavLink href="/master-data/suppliers">
-						<svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-						</svg>
-						Supplier / Customer Management
-					</NavLink>
-					<NavLink href="/master-data/departments">
-						<svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-						</svg>
-						Department Management
 					</NavLink>
 					<NavLink href="/master-data/products">
 						<svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -148,17 +141,23 @@ export default function DashboardLayout({
 						</svg>
 						Product / Part Names
 					</NavLink>
+					<NavLink href="/master-data/suppliers">
+						<svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+						</svg>
+						Supplier / Customer Management
+					</NavLink>
 					<NavLink href="/master-data/testing-equipment">
 						<svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
 						</svg>
 						R&D Testing Equipment
 					</NavLink>
-					<NavLink href="/master-data/test-categories">
+					<NavLink href="/master-data/departments">
 						<svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
 						</svg>
-						Test Categories
+						Department Management
 					</NavLink>
 					<NavLink href="/master-data/users">
 						<svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -223,10 +222,10 @@ function PageTitle() {
 
 	const titleMap: Record<string, string> = {
 		"/dashboard": "Dashboard Overview",
-		"/reports/functional/new": "New Functional Test",
-		"/reports/functional": "Functional Test History",
-		"/reports/reliability": "Reliability Cycles",
+		"/reports/functional/new": "New Test",
+		"/reports/functional": "Test History",
 		"/reports/reliability/new": "Start New Cycle",
+		"/reports/reliability": "Reliability Cycles",
 		"/reliability-availability": "Platform Availability",
 		"/master-data/protocols": "Test Protocols",
 		"/master-data/suppliers": "Supplier / Customer Management",
@@ -239,7 +238,7 @@ function PageTitle() {
 
 	const title =
 		titleMap[pathname] ??
-		(pathname.startsWith("/reports/reliability/") ? "Cycle Detail" : "Dixon QA Portal");
+		(pathname.startsWith("/reports/reliability/") ? "Cycle Detail" : "Dixon Portal");
 
 	return <h2 className="text-lg font-bold text-slate-800">{title}</h2>;
 }

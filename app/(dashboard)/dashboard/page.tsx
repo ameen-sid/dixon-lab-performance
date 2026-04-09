@@ -5,23 +5,23 @@ import { Suspense } from "react";
 
 async function getDashboardStats(startDate?: string, endDate?: string) {
 	try {
-        const where: any = {};
-        if (startDate || endDate) {
-            where.createdAt = {};
-            if (startDate) where.createdAt.gte = new Date(startDate);
-            if (endDate) {
-                const end = new Date(endDate);
-                end.setHours(23, 59, 59, 999);
-                where.createdAt.lte = end;
-            }
-        }
+		const where: any = {};
+		if (startDate || endDate) {
+			where.createdAt = {};
+			if (startDate) where.createdAt.gte = new Date(startDate);
+			if (endDate) {
+				const end = new Date(endDate);
+				end.setHours(23, 59, 59, 999);
+				where.createdAt.lte = end;
+			}
+		}
 
 		const [
-			totalFunctional, 
-			passedFunctional, 
-			failedFunctional, 
+			totalFunctional,
+			passedFunctional,
+			failedFunctional,
 			totalReliability,
-			ongoingReliability, 
+			ongoingReliability,
 			completedReliability,
 			totalDailyLogs
 		] = await Promise.all([
@@ -51,29 +51,29 @@ async function getDashboardStats(startDate?: string, endDate?: string) {
 			},
 		});
 
-		return { 
-			totalFunctional, 
-			passedFunctional, 
-			failedFunctional, 
+		return {
+			totalFunctional,
+			passedFunctional,
+			failedFunctional,
 			totalReliability,
-			ongoingReliability, 
-			completedReliability, 
+			ongoingReliability,
+			completedReliability,
 			totalDailyLogs,
-			passRate, 
-			recentTests 
+			passRate,
+			recentTests
 		};
 	} catch (e) {
-        console.error("Dashboard error:", e);
-		return { 
-			totalFunctional: 0, 
-			passedFunctional: 0, 
-			failedFunctional: 0, 
+		console.error("Dashboard error:", e);
+		return {
+			totalFunctional: 0,
+			passedFunctional: 0,
+			failedFunctional: 0,
 			totalReliability: 0,
-			ongoingReliability: 0, 
-			completedReliability: 0, 
+			ongoingReliability: 0,
+			completedReliability: 0,
 			totalDailyLogs: 0,
-			passRate: 0, 
-			recentTests: [] 
+			passRate: 0,
+			recentTests: []
 		};
 	}
 }
@@ -83,7 +83,7 @@ function formatDate(d: Date) {
 }
 
 export default async function DashboardOverview({ searchParams }: { searchParams: Promise<{ start?: string; end?: string }> }) {
-    const { start, end } = await searchParams;
+	const { start, end } = await searchParams;
 	const stats = await getDashboardStats(start, end);
 
 	return (
@@ -109,16 +109,16 @@ export default async function DashboardOverview({ searchParams }: { searchParams
 				</Link>
 			</div>
 
-            {/* Date Selection */}
-            <Suspense fallback={<div className="h-20 bg-slate-50 rounded-2xl animate-pulse mb-8" />}>
-                <DateFilter />
-            </Suspense>
+			{/* Date Selection */}
+			<Suspense fallback={<div className="h-20 bg-slate-50 rounded-2xl animate-pulse mb-8" />}>
+				<DateFilter />
+			</Suspense>
 
 			{/* ─── Functional Test Overview ─── */}
 			<div className="mb-6">
 				<h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
 					<span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-					Functional Test Overview
+					Test Overview
 				</h4>
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
 					{/* Total Functional */}
@@ -127,7 +127,7 @@ export default async function DashboardOverview({ searchParams }: { searchParams
 						<div className="relative z-10">
 							<div className="flex justify-between items-start">
 								<div>
-									<h3 className="text-slate-500 font-semibold text-[10px] uppercase tracking-wider mb-1">Total Functional</h3>
+									<h3 className="text-slate-500 font-semibold text-[10px] uppercase tracking-wider mb-1">Total Tests</h3>
 									<p className="text-3xl font-extrabold text-slate-900">{stats.totalFunctional}</p>
 								</div>
 								<div className="w-10 h-10 bg-slate-50 text-slate-600 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -313,7 +313,7 @@ export default async function DashboardOverview({ searchParams }: { searchParams
 				{/* Recent Functional Tests Table */}
 				<div className="lg:col-span-2 bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 overflow-hidden">
 					<div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-						<h3 className="font-bold text-slate-900">Recent Functional Tests</h3>
+						<h3 className="font-bold text-slate-900">Recent Tests</h3>
 						<Link href="/reports/functional" className="text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors">
 							View All →
 						</Link>
@@ -322,7 +322,7 @@ export default async function DashboardOverview({ searchParams }: { searchParams
 						{stats.recentTests.length === 0 ? (
 							<div className="p-12 text-center text-slate-400">
 								<p className="font-semibold">No tests yet</p>
-								<p className="text-sm mt-1">Submit your first functional test report.</p>
+								<p className="text-sm mt-1">Submit your first test report.</p>
 							</div>
 						) : (
 							stats.recentTests.map((test) => (
@@ -369,8 +369,8 @@ export default async function DashboardOverview({ searchParams }: { searchParams
 								</svg>
 							</div>
 							<div>
-								<p className="text-sm font-bold text-slate-800">New Functional Test</p>
-								<p className="text-xs text-slate-400">Log a QA inspection</p>
+								<p className="text-sm font-bold text-slate-800">New Test</p>
+								<p className="text-xs text-slate-400">Log a inspection</p>
 							</div>
 						</Link>
 						<Link href="/reports/reliability/new" className="flex items-center gap-3 p-3.5 rounded-xl border border-slate-100 hover:border-indigo-200 hover:bg-indigo-50/50 transition-all group">

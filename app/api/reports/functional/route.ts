@@ -11,7 +11,6 @@ export async function POST(req: Request) {
 			data: {
 				productPartName: body.productPartName,
 				companySupplier: body.companySupplier,
-				customer: body.customer, // [cite: master data enhancement]
 				dateOfArrival: new Date(body.dateOfArrival),
 				batchSlNo: body.batchSlNo,
 				productType: body.productType,

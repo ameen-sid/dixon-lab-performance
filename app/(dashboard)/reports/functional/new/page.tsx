@@ -3,8 +3,9 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
-type Supplier = { id: number; name: string; customer?: string | null };
+type Supplier = { id: number; name: string };
 type Product = { id: number; name: string };
+type TestingEquipment = { id: number; name: string; slNo?: number | null };
 type Protocol = { id: number; testName: string; productType: string; testPurpose: string; testMethod: string; judgementCriteria: string; testDuration: string };
 
 const PRODUCT_TYPES = ["SATL", "FATL", "FAFL"];
@@ -18,12 +19,12 @@ export default function NewFunctionalTest() {
 	const [products, setProducts] = useState<Product[]>([]);
 	const [protocols, setProtocols] = useState<Protocol[]>([]);
 	const [testCategories, setTestCategories] = useState<{ id: number; name: string }[]>([]);
+	const [testingEquipment, setTestingEquipment] = useState<TestingEquipment[]>([]);
 
 	// Form state
 	const [form, setForm] = useState({
 		productPartName: "",
 		companySupplier: "",
-		customer: "", // [cite: master data enhancement]
 		dateOfArrival: "",
 		batchSlNo: "",
 		productType: "",
@@ -75,16 +76,18 @@ export default function NewFunctionalTest() {
 	useEffect(() => {
 		const load = async () => {
 			try {
-				const [suppRes, protoRes, prodRes, catRes] = await Promise.all([
+				const [suppRes, protoRes, prodRes, catRes, equipRes] = await Promise.all([
 					fetch("/api/master-data/suppliers"),
 					fetch("/api/master-data/protocols"),
 					fetch("/api/master-data/products"),
 					fetch("/api/master-data/test-categories"),
+					fetch("/api/master-data/testing-equipment"),
 				]);
 				if (suppRes.ok) setSuppliers(await suppRes.json());
 				if (protoRes.ok) setProtocols(await protoRes.json());
 				if (prodRes.ok) setProducts(await prodRes.json());
 				if (catRes.ok) setTestCategories(await catRes.json());
+				if (equipRes.ok) setTestingEquipment(await equipRes.json());
 			} catch { /* silently fail */ }
 		};
 		load();
@@ -97,12 +100,6 @@ export default function NewFunctionalTest() {
 
 	const handleSupplierChange = (supplierName: string) => {
 		set("companySupplier", supplierName);
-		const supplier = suppliers.find((s) => s.name === supplierName);
-		if (supplier && supplier.customer) {
-			set("customer", supplier.customer);
-		} else {
-			set("customer", "");
-		}
 	};
 
 	// Auto-fill from protocol when test name selected
@@ -260,10 +257,10 @@ export default function NewFunctionalTest() {
 		<div className="max-w-5xl mx-auto pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
 			<div className="mb-8">
 				<h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-					New Functional Test
+					New Test
 				</h2>
 				<p className="text-slate-500 mt-1 font-medium">
-					Log a new single-event QA inspection report.
+					Log a new single-event inspection report.
 				</p>
 			</div>
 
@@ -322,10 +319,7 @@ export default function NewFunctionalTest() {
 										{suppliers.map((s) => <option key={s.id} value={s.name}>{s.name}</option>)}
 									</select>
 								</div>
-								<div>
-									<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Customer</label>
-									<input type="text" value={form.customer} onChange={(e) => set("customer", e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm focus:bg-blue-50/50" placeholder="Auto-filled from supplier..." />
-								</div>
+								{/* Customer field removed */}
 								<div>
 									<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Date of Arrival <span className="text-red-500">*</span></label>
 									<input type="date" value={form.dateOfArrival} onChange={(e) => set("dateOfArrival", e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm" />
@@ -355,9 +349,9 @@ export default function NewFunctionalTest() {
 							</h4>
 							<div className="mb-6">
 								<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Test Category <span className="text-red-500">*</span></label>
-								<select 
-									value={form.testCategory} 
-									onChange={(e) => set("testCategory", e.target.value)} 
+								<select
+									value={form.testCategory}
+									onChange={(e) => set("testCategory", e.target.value)}
 									className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm font-semibold appearance-none"
 								>
 									<option value="">Select Category...</option>
@@ -453,8 +447,19 @@ export default function NewFunctionalTest() {
 							<div className="space-y-5">
 								<div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 									<div>
-										<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Instrument</label>
-										<input type="text" value={form.instrument} onChange={(e) => set("instrument", e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm" placeholder="e.g. Power Meter, AC Power" />
+										<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Instrument <span className="text-red-500">*</span></label>
+										<select 
+											value={form.instrument} 
+											onChange={(e) => set("instrument", e.target.value)} 
+											className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm appearance-none"
+										>
+											<option value="">Select instrument...</option>
+											{testingEquipment.map((e) => (
+												<option key={e.id} value={e.name}>
+													{e.name} {e.slNo ? `(S/N: ${e.slNo})` : ""}
+												</option>
+											))}
+										</select>
 									</div>
 									<div>
 										<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Test Purpose</label>

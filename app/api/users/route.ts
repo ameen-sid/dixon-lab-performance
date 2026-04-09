@@ -23,6 +23,19 @@ export async function POST(req: Request) {
 			);
 		}
 
+		// Validation: Only one SUPER_ADMIN allowed in the system
+		if (role === "SUPER_ADMIN") {
+			const existingSuperAdmin = await prisma.user.findFirst({
+				where: { role: "SUPER_ADMIN" },
+			});
+			if (existingSuperAdmin) {
+				return NextResponse.json(
+					{ error: "A Super Admin already exists. Only one Super Admin is allowed in the system." },
+					{ status: 400 },
+				);
+			}
+		}
+
 		// 1. Hash the password
 		const saltRounds = 10;
 		const hashedPassword = await bcrypt.hash(password, saltRounds);

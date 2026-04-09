@@ -63,7 +63,7 @@ export default function LoginPage() {
 						</svg>
 					</div>
 					<h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-						DIXON QA
+						DIXON
 					</h1>
 					<p className="text-slate-500 mt-2 font-medium">
 						Reliability Testing Portal
