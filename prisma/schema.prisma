@@ -3,26 +3,82 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "sqlserver"
   url      = env("DATABASE_URL")
 }
-
 
 // ==========================================
 // 4. USER & AUTHENTICATION
 // ==========================================
 model User {
-  id           Int         @id @default(autoincrement())
-  name         String
-  username     String      @unique // Changed from email to username
-  password     String      // Hashed password
-  role         String      @default("TECHNICIAN")
+  id       Int    @id @default(autoincrement())
+  name     String
+  username String @unique
+  password String
+  role     String @default("Requester")
 
   departmentId Int?
   department   Department? @relation(fields: [departmentId], references: [id])
 
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  requests         TestRequest[] @relation("RequestedBy")
+  assignedRequests TestRequest[] @relation("AssignedTo")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TestRequest {
+  id                   Int     @id @default(autoincrement())
+  samplePartName       String
+  samplePartNo         String?
+  customerSupplierName String?
+  sampleQuantity       Int
+  modelIdentification  String?
+  department           String?
+  testName             String?
+  testStandard         String?
+  testPurpose          String? @db.NVarChar(Max)
+  status               String  @default("Pending") // Pending, Approved, Rejected, Completed
+  remarks              String? @db.NVarChar(Max)
+
+  requesterId Int
+  requester   User @relation("RequestedBy", fields: [requesterId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  assignedToId Int?
+  assignedTo   User? @relation("AssignedTo", fields: [assignedToId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  inspection InspectionResult?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model InspectionResult {
+  id            Int         @id @default(autoincrement())
+  testRequestId Int         @unique
+  testRequest   TestRequest @relation(fields: [testRequestId], references: [id], onDelete: Cascade)
+
+  // Checksheet Points
+  descriptionMatch    String // Yes / No / N.A
+  modelMatch          String // Yes / No / N.A
+  serialMatch         String // Yes / No / N.A
+  labelAvailable      String // Yes / No / N.A
+  ratingMatch         String // Yes / No / N.A
+  brandMatch          String // Yes / No / N.A
+  manualProvided      String // Yes / No / N.A
+  damageSign          String // Yes / No / N.A
+  accessoriesReceived String // Yes / No / N.A
+
+  allottedId String?
+  remarks    String? @db.NVarChar(Max)
+  imageUrl   String? // [cite: Point 12]
+  isPassed   Boolean @default(false)
+
+  inspectedById Int
+  inspectedBy   String // Name of the engineer
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Department {
@@ -38,14 +94,92 @@ model Department {
 // ==========================================
 model TestProtocol {
   id                Int      @id @default(autoincrement())
-  testName          String   @unique // e.g., TR, CR, CD, BD, "Temperature rise test: Wash"
-  productType       String   @default("SATL") // [cite: dependent dropdown enhancement]
-  testPurpose       String?  @db.Text 
-  testMethod        String   @db.Text
-  judgementCriteria String   @db.Text
-  testDuration      String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  name              String   // Protocol Name string
+  
+  testTypeId        Int?
+  testType          TestType? @relation(fields: [testTypeId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  
+  testCategoryId    Int?
+  testCategory      TestCategory? @relation(fields: [testCategoryId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  productType       String   @default("SATL")
+  testMethod        String   @db.NVarChar(Max)
+  judgementCriteria String   @db.NVarChar(Max)
+  
+  testPlans         TestPlan[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TestPlan {
+  id             Int      @id @default(autoincrement())
+  
+  testTypeId     Int
+  testType       TestType @relation(fields: [testTypeId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  
+  testCategoryId Int
+  testCategory   TestCategory @relation(fields: [testCategoryId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  
+  testProtocolId Int
+  testProtocol   TestProtocol @relation(fields: [testProtocolId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  referenceStd   String?
+  numDays        Int
+  startDate      DateTime
+  endDate        DateTime
+  remarks        String?  @db.NVarChar(Max)
+  stationIds     String?  // Comma separated station IDs
+  
+  status         String   @default("PLANNED") // PLANNED, ONGOING, COMPLETED
+  
+  dailyLogs      DailyChecksheet[]
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model DailyChecksheet {
+  id         Int      @id @default(autoincrement())
+  testPlanId Int
+  testPlan   TestPlan @relation(fields: [testPlanId], references: [id], onDelete: Cascade)
+
+  date          DateTime
+  loadCondition String?
+  
+  // Cycles
+  numCycles     Int?
+  numCyclesWash Int?
+  numCyclesSpin Int?
+  totalCycles   Int?
+
+  // FATL Components
+  motor         String?
+  clutch        String?
+  waterInlet    String?
+  pressureSensor String?
+  pcb           String?
+  suspensionRod String?
+  drainMotor    String?
+  lidSwitch     String?
+  inverterBoard String?
+
+  // SATL Components
+  washMotor     String?
+  spinMotor     String?
+  gearBox       String?
+  sealBellow    String?
+  washTimer     String?
+  spinTimer     String?
+  drainSelector String?
+  capacitor     String?
+  safetySwitch  String?
+
+  remarks       String? @db.NVarChar(Max)
+
+  createdAt     DateTime @default(now())
+
+  @@unique([testPlanId, date])
 }
 
 model ProductPart {
@@ -66,44 +200,44 @@ model Supplier {
 // 2. FUNCTIONAL TEST (One-Time Event)
 // ==========================================
 model FunctionalTest {
-  id                Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
   // Basic Info
-  productPartName   String   // [cite: 2]
-  companySupplier   String   // [cite: 3]
-  dateOfArrival     DateTime // [cite: 4]
-  batchSlNo         String   // [cite: 5]
-  productType       String   // e.g., SATL, FATL, FAFL [cite: 6-9]
-  testName          String   // e.g., TR, CR, CD, BD [cite: 11-15]
-  testCategory      String?  
+  productPartName String // [cite: 2]
+  companySupplier String // [cite: 3]
+  dateOfArrival   DateTime // [cite: 4]
+  batchSlNo       String // [cite: 5]
+  productType     String // e.g., SATL, FATL, FAFL [cite: 6-9]
+  testName        String // e.g., TR, CR, CD, BD [cite: 11-15]
+  testCategory    String?
 
   // Test Specifics
-  model             String?  // e.g., RIL, P1-UI-1.5,8.5kg [cite: 29-30]
-  samples           Int?     // Changed from String to Int [cite: 38-39]
-  instrument        String?  // e.g., Power Meter, AC Power [cite: 43-44]
-  testPurpose       String?  @db.Text // [cite: 45-46]
+  model       String? // e.g., RIL, P1-UI-1.5,8.5kg [cite: 29-30]
+  samples     Int? // Changed from String to Int [cite: 38-39]
+  instrument  String? // e.g., Power Meter, AC Power [cite: 43-44]
+  testPurpose String? @db.NVarChar(Max) // [cite: 45-46]
 
   // Protocol Data (Can be auto-filled from Master Data)
-  testMethod        String   @db.Text // [cite: 20]
-  judgementCriteria String   @db.Text // [cite: 21]
+  testMethod        String @db.NVarChar(Max) // [cite: 20]
+  judgementCriteria String @db.NVarChar(Max) // [cite: 21]
 
   // Results
-  testObservation   String   @db.Text // [cite: 22]
-  isPass            Boolean  // True = Pass, False = fail [cite: 23-25]
-  testStartDate     DateTime // [cite: 17]
-  testEndDate       DateTime // [cite: 18]
-  testDuration      String?  // [cite: 19]
+  testObservation String   @db.NVarChar(Max) // [cite: 22]
+  isPass          Boolean // True = Pass, False = fail [cite: 23-25]
+  testStartDate   DateTime // [cite: 17]
+  testEndDate     DateTime // [cite: 18]
+  testDuration    String? // [cite: 19]
 
   // Relationships
-  images            TestImage[]
+  images TestImage[]
 
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model TestImage {
   id               Int            @id @default(autoincrement())
-  imageUrl         String         // URL from your storage provider [cite: 26]
+  imageUrl         String // URL from your storage provider [cite: 26]
   functionalTestId Int
   functionalTest   FunctionalTest @relation(fields: [functionalTestId], references: [id], onDelete: Cascade)
   uploadedAt       DateTime       @default(now())
@@ -113,80 +247,80 @@ model TestImage {
 // 3. RELIABILITY TEST (Continuous Cycle)
 // ==========================================
 model ReliabilityTest {
-  id          Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
   // Header Data
-  partName          String
-  partNo            String?
-  customerSupplier  String?
-  testPurpose       String?  @db.Text
-  sampleQuantity    Int?
-  testEquipment     String?
-  startDate         DateTime
-  endDate           DateTime?
-  reportIssueDate   DateTime?
-  calibrationDueDate DateTime?
+  partName            String
+  partNo              String?
+  customerSupplier    String?
+  testPurpose         String?   @db.NVarChar(Max)
+  sampleQuantity      Int?
+  testEquipment       String?
+  startDate           DateTime
+  endDate             DateTime?
+  reportIssueDate     DateTime?
+  calibrationDueDate  DateTime?
   ambientTempHumidity String?
-  testPlace         String?
-  standard          String?
-  testMethod        String?  @db.Text
-  judgementCriteria String?  @db.Text
-  productType       String?
-  nameOfTest        String?
-  
+  testPlace           String?
+  standard            String?
+  testMethod          String?   @db.NVarChar(Max)
+  judgementCriteria   String?   @db.NVarChar(Max)
+  productType         String?
+  nameOfTest          String?
+
   // Legacy/Backwards Compatibility
-  modelCap    String?   // Optional for compatibility
-  vendor      String?   // Optional for compatibility
-  clothLoad   String?   // Optional for compatibility
-  
-  status      String   @default("ONGOING") // e.g., ONGOING, COMPLETED
+  modelCap  String? // Optional for compatibility
+  vendor    String? // Optional for compatibility
+  clothLoad String? // Optional for compatibility
+
+  status String @default("ONGOING") // e.g., ONGOING, COMPLETED
 
   // Relationships
-  dailyLogs   DailyLog[]
-  stations    Station[]
+  dailyLogs DailyLog[]
+  stations  Station[]
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Station {
-  id          String   @id // e.g., "P1-S1"
-  platformId  String   // e.g., "P1"
-  status      String   @default("AVAILABLE") // AVAILABLE, OCCUPIED
-  
+  id         String @id // e.g., "P1-S1"
+  platformId String // e.g., "P1"
+  status     String @default("AVAILABLE") // AVAILABLE, OCCUPIED
+
   reliabilityTestId Int?
   reliabilityTest   ReliabilityTest? @relation(fields: [reliabilityTestId], references: [id])
 }
 
 model DailyLog {
-  id                  Int             @id @default(autoincrement())
-  reliabilityTestId   Int
-  reliabilityTest     ReliabilityTest @relation(fields: [reliabilityTestId], references: [id], onDelete: Cascade)
+  id                Int             @id @default(autoincrement())
+  reliabilityTestId Int
+  reliabilityTest   ReliabilityTest @relation(fields: [reliabilityTestId], references: [id], onDelete: Cascade)
 
   // Table Rows (Expert Metrics)
-  logDate             DateTime        // The specific date for this row
-  noOfWashCycle       Int?
-  noOfSpinCycle       Int?
-  sealBellow          String?
-  washTimer           String?
-  gearBox             String?
-  pulsator            String?
-  washCurrentCycle    String?
-  spinCurrentCycle    String?
-  
+  logDate          DateTime // The specific date for this row
+  noOfWashCycle    Int?
+  noOfSpinCycle    Int?
+  sealBellow       String?
+  washTimer        String?
+  gearBox          String?
+  pulsator         String?
+  washCurrentCycle String?
+  spinCurrentCycle String?
+
   // New Excel Sheet Fields
-  cycleCount          Int?
-  pcb                 String?
-  feedValve           String?
-  washMotor           String?
-  clutch              String?
-  errorDetail         String?
-  otherIssues         String?
+  cycleCount  Int?
+  pcb         String?
+  feedValve   String?
+  washMotor   String?
+  clutch      String?
+  errorDetail String?
+  otherIssues String?
 
-  remarks             String?         @db.Text
+  remarks String? @db.NVarChar(Max)
 
-  createdAt           DateTime        @default(now())
-  updatedAt           DateTime        @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([reliabilityTestId, logDate]) // Ensures only one log per day per test
 }
@@ -195,24 +329,48 @@ model DailyLog {
 // 5. R&D TESTING EQUIPMENT
 // ==========================================
 model TestingEquipment {
-  id                 Int      @id @default(autoincrement())
-  slNo               Int?     // Corresponding to user provided serial numbers
-  name               String   @unique
+  id                 Int       @id @default(autoincrement())
+  slNo               Int? // Corresponding to user provided serial numbers
+  name               String    @unique
   calibrationDueDate DateTime?
-  
-  status             String   @default("ACTIVE") // ACTIVE, OUT_OF_CALIBRATION, MAINTENANCE
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+
+  status    String   @default("ACTIVE") // ACTIVE, OUT_OF_CALIBRATION, MAINTENANCE
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TopEquipment {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  status    String   @default("AVAILABLE") // AVAILABLE, OCCUPIED, MAINTENANCE
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // ==========================================
 // 6. TEST CATEGORY MANAGEMENT
 // ==========================================
 model TestCategory {
-  id                 Int      @id @default(autoincrement())
-  slNo               Int?
-  name               String   @unique
-  
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  id         Int      @id @default(autoincrement())
+  slNo       Int?
+  name       String   @unique
+  testTypeId Int?
+  testType   TestType? @relation(fields: [testTypeId], references: [id])
+
+  protocols  TestProtocol[]
+  testPlans  TestPlan[]
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model TestType {
+  id         Int            @id @default(autoincrement())
+  name       String         @unique
+  categories TestCategory[]
+  protocols  TestProtocol[]
+  testPlans  TestPlan[]
+
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
 }

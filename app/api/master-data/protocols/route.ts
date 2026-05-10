@@ -8,24 +8,18 @@ export async function POST(req: Request) {
 
 		const newProtocol = await prisma.testProtocol.create({
 			data: {
-				testName: body.testName,
+				name: body.name,
+				testTypeId: body.testTypeId ? parseInt(body.testTypeId) : null,
+				testCategoryId: body.testCategoryId ? parseInt(body.testCategoryId) : null,
 				productType: body.productType || "SATL",
-				testPurpose: body.testPurpose,
 				testMethod: body.testMethod,
 				judgementCriteria: body.judgementCriteria,
-				testDuration: body.testDuration,
 			},
 		});
 
 		return NextResponse.json(newProtocol, { status: 201 });
 	} catch (error: any) {
 		console.error("Error creating test protocol:", error);
-		if (error.code === "P2002") {
-			return NextResponse.json(
-				{ error: "A protocol with this name already exists." },
-				{ status: 409 },
-			);
-		}
 		return NextResponse.json(
 			{ error: "Failed to create test protocol" },
 			{ status: 500 },
@@ -35,9 +29,9 @@ export async function POST(req: Request) {
 
 export async function GET() {
 	try {
-		// Fetch all protocols, ordered alphabetically by name
 		const protocols = await prisma.testProtocol.findMany({
-			orderBy: { testName: "asc" },
+			include: { testType: true, testCategory: true },
+			orderBy: { name: "asc" },
 		});
 		return NextResponse.json(protocols, { status: 200 });
 	} catch (error) {

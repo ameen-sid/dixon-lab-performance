@@ -8,13 +8,14 @@ export async function PUT(
 	try {
 		const { id } = await params;
 		const body = await req.json();
-		const { name, slNo } = body;
+		const { name, slNo, testTypeId } = body;
 
 		const updated = await prisma.testCategory.update({
 			where: { id: parseInt(id) },
 			data: {
 				name,
 				slNo: slNo ? parseInt(slNo) : undefined,
+				testTypeId: testTypeId ? parseInt(testTypeId) : null,
 			},
 		});
 

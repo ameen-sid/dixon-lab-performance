@@ -23,7 +23,23 @@ export default function LoginPage() {
 			});
 
 			if (res.ok) {
-				router.push("/dashboard");
+				const data = await res.json();
+				const role = data.user.role;
+
+				if (role === "Inspector") {
+					router.push("/dashboard/inspector");
+				} else if (role === "Lab Manager") {
+					router.push("/dashboard/manager");
+				} else if (role === "Engineer") {
+					router.push("/dashboard/engineer");
+				} else if (role === "Head") {
+					router.push("/dashboard"); // Head usually goes to main overview
+				} else if (role === "Admin") {
+					router.push("/dashboard"); // Admin usually goes to main overview
+				} else {
+					router.push("/dashboard");
+				}
+				
 				router.refresh();
 			} else {
 				const data = await res.json();

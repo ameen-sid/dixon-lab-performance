@@ -14,24 +14,18 @@ export async function PUT(
 		const updated = await prisma.testProtocol.update({
 			where: { id: protocolId },
 			data: {
-				testName: body.testName,
+				name: body.name,
+				testTypeId: body.testTypeId ? parseInt(body.testTypeId) : null,
+				testCategoryId: body.testCategoryId ? parseInt(body.testCategoryId) : null,
 				productType: body.productType,
-				testPurpose: body.testPurpose,
 				testMethod: body.testMethod,
 				judgementCriteria: body.judgementCriteria,
-				testDuration: body.testDuration,
 			},
 		});
 
 		return NextResponse.json(updated, { status: 200 });
 	} catch (error: any) {
 		console.error("Error updating protocol:", error);
-		if (error.code === "P2002") {
-			return NextResponse.json(
-				{ error: "A protocol with this name already exists." },
-				{ status: 409 },
-			);
-		}
 		return NextResponse.json(
 			{ error: "Failed to update protocol" },
 			{ status: 500 },

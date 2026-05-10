@@ -2,6 +2,8 @@ import prisma from "@/src/lib/prisma";
 import Link from "next/link";
 import DateFilter from "@/src/components/dashboard/DateFilter";
 import { Suspense } from "react";
+import { getCurrentUser } from "@/src/lib/auth";
+import { redirect } from "next/navigation";
 
 async function getDashboardStats(startDate?: string, endDate?: string) {
 	try {
@@ -83,6 +85,25 @@ function formatDate(d: Date) {
 }
 
 export default async function DashboardOverview({ searchParams }: { searchParams: Promise<{ start?: string; end?: string }> }) {
+	const user = await getCurrentUser();
+	if (!user) redirect("/login");
+
+	if (user.role === "Requester") {
+		redirect("/dashboard/requester");
+	}
+
+	if (user.role === "Head") {
+		redirect("/dashboard/head");
+	}
+
+	if (user.role === "Lab Manager") {
+		redirect("/dashboard/manager");
+	}
+
+	if (user.role === "Engineer") {
+		redirect("/dashboard/engineer");
+	}
+
 	const { start, end } = await searchParams;
 	const stats = await getDashboardStats(start, end);
 

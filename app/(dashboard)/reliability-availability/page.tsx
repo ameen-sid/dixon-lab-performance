@@ -28,9 +28,7 @@ export default function ReliabilityPlatformAvailability() {
 	const fetchStations = useCallback(async () => {
 		try {
 			const res = await fetch("/api/stations");
-			if (res.ok) {
-				setStations(await res.json());
-			}
+			if (res.ok) setStations(await res.json());
 		} catch (err) {
 			console.error("Error fetching stations:", err);
 		} finally {
@@ -40,7 +38,6 @@ export default function ReliabilityPlatformAvailability() {
 
 	useEffect(() => {
 		fetchStations();
-		// Poll for updates every 30 seconds
 		const interval = setInterval(fetchStations, 30000);
 		return () => clearInterval(interval);
 	}, [fetchStations]);
@@ -66,76 +63,42 @@ export default function ReliabilityPlatformAvailability() {
 		});
 	}, [stations]);
 
-	const totalAvailable = useMemo(() => stations.filter(s => s.status === "AVAILABLE").length, [stations]);
+	const totalAvailable = stations.filter(s => s.status === "AVAILABLE").length;
 	const totalOccupied = stations.length - totalAvailable;
 
 	return (
-		<div className="max-w-6xl mx-auto pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
-			{/* Header & Title */}
-			<div className="mb-8 flex justify-between items-end">
-				<div>
-					<h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">Platform Availability</h2>
-					<p className="text-slate-500 mt-1 font-medium">Real-time status monitoring of all 14 testing platforms.</p>
+		<div className="h-[calc(100vh-120px)] flex flex-col gap-4 animate-in fade-in duration-500">
+			{/* Compact Header */}
+			<div className="flex items-center justify-between bg-white px-6 py-3 rounded-2xl border border-slate-200 shadow-sm shrink-0">
+				<div className="flex items-center gap-6">
+					<h2 className="text-xl font-black text-slate-900 tracking-tight">Platform Live Tracking</h2>
+					<div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest">
+						<div className="flex items-center gap-2">
+							<span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+							<span className="text-emerald-600">Available: {totalAvailable}</span>
+						</div>
+						<div className="flex items-center gap-2">
+							<span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
+							<span className="text-rose-600">Occupied/Reserved: {totalOccupied}</span>
+						</div>
+					</div>
 				</div>
-				<button 
-					onClick={fetchStations}
-					className="p-2 text-slate-400 hover:text-blue-600 transition-colors"
-					title="Refresh Data"
-				>
-					<svg className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<button onClick={fetchStations} className="p-2 text-slate-400 hover:text-blue-600 transition-colors">
+					<svg className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
 					</svg>
 				</button>
 			</div>
 
-			{/* Top Summary Stats */}
-			<div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-				<div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] group hover:border-emerald-200 transition-all duration-300">
-					<div className="flex items-center justify-between">
-						<div>
-							<p className="text-[10px] font-bold uppercase tracking-widest text-emerald-500 mb-1">Testing Capacity</p>
-							<h3 className="text-3xl font-extrabold text-slate-800 tracking-tight">Available Stations</h3>
-						</div>
-						<div className="text-5xl font-extrabold text-emerald-500 tabular-nums">
-							{loading ? "..." : totalAvailable}
-						</div>
-					</div>
-					<div className="mt-6 flex gap-3 items-center">
-						<div className="h-2 w-full bg-slate-50 rounded-full overflow-hidden">
-							<div className="h-full bg-emerald-500 rounded-full transition-all duration-1000" style={{ width: `${(totalAvailable / 140) * 100}%` }} />
-						</div>
-						<span className="text-xs font-bold text-slate-400 min-w-[35px]">{loading ? "0" : Math.round((totalAvailable / 140) * 100)}%</span>
-					</div>
-				</div>
-
-				<div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] group hover:border-rose-200 transition-all duration-300">
-					<div className="flex items-center justify-between">
-						<div>
-							<p className="text-[10px] font-bold uppercase tracking-widest text-rose-500 mb-1">Testing Capacity</p>
-							<h3 className="text-3xl font-extrabold text-slate-800 tracking-tight">Occupied Stations</h3>
-						</div>
-						<div className="text-5xl font-extrabold text-rose-500 tabular-nums">
-							{loading ? "..." : totalOccupied}
-						</div>
-					</div>
-					<div className="mt-6 flex gap-3 items-center">
-						<div className="h-2 w-full bg-slate-50 rounded-full overflow-hidden">
-							<div className="h-full bg-rose-500 rounded-full transition-all duration-1000" style={{ width: `${(totalOccupied / 140) * 100}%` }} />
-						</div>
-						<span className="text-xs font-bold text-slate-400 min-w-[35px]">{loading ? "0" : Math.round((totalOccupied / 140) * 100)}%</span>
-					</div>
-				</div>
-			</div>
-
-			{/* Platforms List */}
-			<div className="flex flex-col gap-6">
+			{/* Platforms Grid - Compact 7x2 layout */}
+			<div className="flex-1 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 min-h-0 overflow-hidden">
 				{loading && stations.length === 0 ? (
-					Array.from({ length: 3 }).map((_, i) => (
-						<div key={i} className="h-48 bg-white/50 animate-pulse rounded-3xl border border-slate-100" />
+					Array.from({ length: 14 }).map((_, i) => (
+						<div key={i} className="bg-slate-50 border border-slate-100 rounded-2xl animate-pulse" />
 					))
 				) : (
 					platforms.map((platform) => (
-						<PlatformRow key={platform.id} platform={platform} />
+						<CompactPlatform key={platform.id} platform={platform} />
 					))
 				)}
 			</div>
@@ -143,89 +106,59 @@ export default function ReliabilityPlatformAvailability() {
 	);
 }
 
-function PlatformRow({ platform }: { platform: Platform }) {
-	const topRow = platform.stations.slice(0, 5);
-	const bottomRow = platform.stations.slice(5, 10);
-
+function CompactPlatform({ platform }: { platform: Platform }) {
 	return (
-		<div className="flex flex-row items-stretch bg-white rounded-3xl border border-slate-200 shadow-sm group/platform relative hover:shadow-md hover:border-blue-200 hover:z-[50] transition-all duration-300">
-			{/* Platform ID Header */}
-			<div className="w-[120px] bg-slate-900 flex flex-col items-center justify-center p-6 rounded-l-[1.4rem] group-hover/platform:bg-blue-600 transition-colors duration-500">
-				<p className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1">Unit</p>
-				<span className="text-2xl font-extrabold text-white tracking-tight">
-					{platform.id}
-				</span>
+		<div className="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col min-h-0 hover:border-blue-300 transition-colors">
+			{/* Small Header */}
+			<div className="bg-slate-900 py-2 px-3 rounded-t-[0.9rem] flex justify-between items-center">
+				<span className="text-xs font-black text-white">{platform.id}</span>
+				<span className="text-[8px] font-bold text-white/40 uppercase tracking-widest">Unit</span>
 			</div>
 
-			{/* Stations Layout (2 Horizontal Rows) */}
-			<div className="flex-1 p-6 flex flex-col gap-4">
-				<div className="grid grid-cols-5 gap-4">
-					{topRow.map((station) => (
-						<StationItem key={station.id} station={station} />
-					))}
-				</div>
-				<div className="grid grid-cols-5 gap-4">
-					{bottomRow.map((station) => (
-						<StationItem key={station.id} station={station} />
-					))}
-				</div>
+			{/* Compact Station Grid - 2x5 */}
+			<div className="flex-1 p-2 grid grid-cols-2 gap-1.5">
+				{platform.stations.map((station) => (
+					<CompactStation key={station.id} station={station} />
+				))}
 			</div>
 		</div>
 	);
 }
 
-function StationItem({ station }: { station: Station }) {
+function CompactStation({ station }: { station: Station }) {
 	const isOccupied = station.status === "OCCUPIED";
 	const test = station.reliabilityTest;
+	const isPlanned = (test as any)?.isPlanned;
 
 	return (
 		<div className={`
-			relative px-4 py-3 rounded-xl border border-slate-100 bg-white transition-all duration-300 group/station hover:z-[50] hover:border-blue-300 hover:shadow-md
+			relative aspect-square md:aspect-auto p-1.5 rounded-lg border flex flex-col items-center justify-center transition-all group/station cursor-help
+			${isOccupied 
+				? "bg-rose-50 border-rose-100" 
+				: "bg-emerald-50 border-emerald-100"}
 		`}>
-			<div className="flex items-center justify-between">
-				<span className="text-[11px] font-bold tracking-tight text-slate-700">{station.id.split("-")[1]}</span>
-				<div className={`
-					w-2 h-2 rounded-full shadow-sm
-					${isOccupied ? "bg-rose-500 animate-pulse ring-2 ring-rose-100" : "bg-emerald-500 ring-2 ring-emerald-100"}
-				`} />
-			</div>
+			<span className={`text-[9px] font-black leading-none ${isOccupied ? "text-rose-700" : "text-emerald-700"}`}>
+				{station.id.split("-S")[1]}
+			</span>
+			<div className={`
+				w-1 h-1 rounded-full mt-1
+				${isOccupied ? "bg-rose-500 shadow-[0_0_4px_rgba(244,63,94,0.5)]" : "bg-emerald-500"}
+			`} />
 
-			{/* Floating Detail Tooltip on Hover */}
-			<div className="absolute left-1/2 -translate-x-1/2 bottom-[110%] w-64 opacity-0 group-hover/station:opacity-100 transition-all duration-300 pointer-events-none z-[60] scale-95 group-hover/station:scale-100 origin-bottom">
-				<div className="bg-slate-900 text-white rounded-2xl p-5 shadow-2xl relative">
-					<div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-slate-900" />
-					
+			{/* Compact Tooltip */}
+			<div className="fixed opacity-0 group-hover/station:opacity-100 transition-all duration-200 pointer-events-none z-[100] scale-90 group-hover/station:scale-100 transform -translate-x-1/2 -translate-y-full mb-2">
+				<div className="bg-slate-900 text-white rounded-xl p-4 shadow-2xl w-56 border border-slate-700">
 					{isOccupied && test ? (
-						<div className="space-y-3">
-							<div className="flex items-center justify-between border-b border-white/10 pb-2">
-								<span className="text-[9px] font-bold uppercase tracking-widest text-white/50">Active Test</span>
-								<div className="px-2 py-0.5 rounded bg-rose-500 text-[8px] font-black uppercase">Occupied</div>
+						<div className="space-y-2">
+							<div className="flex justify-between items-center border-b border-white/10 pb-1.5">
+								<span className="text-[8px] font-black uppercase text-white/50">{isPlanned ? "Planned" : "Active"}</span>
+								<span className="text-[8px] font-black px-1.5 py-0.5 rounded bg-rose-500 uppercase">Occupied</span>
 							</div>
-							<div>
-								<p className="text-[9px] text-white/40 font-bold mb-0.5 uppercase tracking-wide">Part Name</p>
-								<p className="text-xs font-bold text-white leading-snug">{test.partName}</p>
-							</div>
-							<div>
-								<p className="text-[9px] text-white/40 font-bold mb-0.5 uppercase tracking-wide">Test Category</p>
-								<p className="text-[10px] font-bold text-blue-400">{test.nameOfTest}</p>
-							</div>
-							{test.customerSupplier && (
-								<div>
-									<p className="text-[9px] text-white/40 font-bold mb-0.5 uppercase tracking-wide">Vendor</p>
-									<p className="text-[10px] font-bold text-white">{test.customerSupplier}</p>
-								</div>
-							)}
+							<p className="text-[10px] font-bold leading-tight">{test.partName}</p>
+							<p className="text-[9px] font-bold text-blue-400">{test.nameOfTest}</p>
 						</div>
 					) : (
-						<div className="flex items-center gap-3 py-1">
-							<div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center">
-								<div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-							</div>
-							<div>
-								<p className="text-[11px] font-bold text-white uppercase tracking-wider">Available</p>
-								<p className="text-[9px] text-white/40 font-medium">Ready for next assignment</p>
-							</div>
-						</div>
+						<p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest text-center py-1">Station Available</p>
 					)}
 				</div>
 			</div>

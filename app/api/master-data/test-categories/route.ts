@@ -4,6 +4,7 @@ import prisma from "@/src/lib/prisma";
 export async function GET() {
 	try {
 		const categories = await prisma.testCategory.findMany({
+			include: { testType: true },
 			orderBy: { slNo: "asc" },
 		});
 		return NextResponse.json(categories);
@@ -16,7 +17,7 @@ export async function GET() {
 export async function POST(req: Request) {
 	try {
 		const body = await req.json();
-		const { name, slNo } = body;
+		const { name, slNo, testTypeId } = body;
 
 		if (!name) return NextResponse.json({ error: "Name is required" }, { status: 400 });
 
@@ -24,6 +25,7 @@ export async function POST(req: Request) {
 			data: {
 				name,
 				slNo: slNo ? parseInt(slNo) : null,
+				testTypeId: testTypeId ? parseInt(testTypeId) : null,
 			},
 		});
 

@@ -1,29 +1,36 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 
 type Protocol = {
 	id: number;
-	testName: string;
+	name: string;
+	testTypeId: number | null;
+	testType: { name: string } | null;
+	testCategoryId: number | null;
+	testCategory: { name: string } | null;
 	productType: string;
-	testPurpose: string;
 	testMethod: string;
 	judgementCriteria: string;
-	testDuration: string;
 	createdAt: string;
 };
 
+type TestType = { id: number; name: string };
+type TestCategory = { id: number; name: string; testTypeId: number | null };
+
 const EMPTY_FORM = {
-	testName: "",
+	name: "",
+	testTypeId: "",
+	testCategoryId: "",
 	productType: "SATL",
-	testPurpose: "",
 	testMethod: "",
 	judgementCriteria: "",
-	testDuration: "",
 };
 
 export default function ProtocolManagement() {
 	const [protocols, setProtocols] = useState<Protocol[]>([]);
+	const [testTypes, setTestTypes] = useState<TestType[]>([]);
+	const [allCategories, setAllCategories] = useState<TestCategory[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [showModal, setShowModal] = useState(false);
 	const [editTarget, setEditTarget] = useState<Protocol | null>(null);
@@ -34,16 +41,28 @@ export default function ProtocolManagement() {
 	const [expandedId, setExpandedId] = useState<number | null>(null);
 	const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
 
-	const fetchProtocols = useCallback(async () => {
+	const fetchData = useCallback(async () => {
 		setLoading(true);
 		try {
-			const res = await fetch("/api/master-data/protocols");
-			if (res.ok) setProtocols(await res.json());
+			const [pRes, tRes, cRes] = await Promise.all([
+				fetch("/api/master-data/protocols"),
+				fetch("/api/master-data/test-types"),
+				fetch("/api/master-data/test-categories")
+			]);
+			if (pRes.ok) setProtocols(await pRes.json());
+			if (tRes.ok) setTestTypes(await tRes.json());
+			if (cRes.ok) setAllCategories(await cRes.json());
 		} catch { /* silently fail */ }
 		finally { setLoading(false); }
 	}, []);
 
-	useEffect(() => { fetchProtocols(); }, [fetchProtocols]);
+	useEffect(() => { fetchData(); }, [fetchData]);
+
+	// Filtered categories based on selected Test Type
+	const filteredCategories = useMemo(() => {
+		if (!form.testTypeId) return [];
+		return allCategories.filter(c => c.testTypeId === parseInt(form.testTypeId));
+	}, [allCategories, form.testTypeId]);
 
 	const openAdd = () => {
 		setEditTarget(null);
@@ -55,12 +74,12 @@ export default function ProtocolManagement() {
 	const openEdit = (p: Protocol) => {
 		setEditTarget(p);
 		setForm({
-			testName: p.testName,
+			name: p.name,
+			testTypeId: p.testTypeId?.toString() || "",
+			testCategoryId: p.testCategoryId?.toString() || "",
 			productType: p.productType || "",
-			testPurpose: p.testPurpose || "",
 			testMethod: p.testMethod,
 			judgementCriteria: p.judgementCriteria,
-			testDuration: p.testDuration || "",
 		});
 		setError("");
 		setShowModal(true);
@@ -78,14 +97,21 @@ export default function ProtocolManagement() {
 	};
 
 	const set = (field: string, value: string) => {
-		setForm((prev) => ({ ...prev, [field]: value }));
+		setForm((prev) => {
+			const next = { ...prev, [field]: value };
+			// Reset category if type changes
+			if (field === "testTypeId") {
+				next.testCategoryId = "";
+			}
+			return next;
+		});
 		setError("");
 	};
 
 	const handleSave = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (!form.testName || !form.testMethod || !form.judgementCriteria) {
-			setError("Test Name, Test Method, and Judgement Criteria are required.");
+		if (!form.name || !form.testMethod || !form.judgementCriteria) {
+			setError("Protocol Name, Test Method, and Judgement Criteria are required.");
 			return;
 		}
 		setSaving(true);
@@ -100,7 +126,7 @@ export default function ProtocolManagement() {
 			if (res.ok) {
 				setSuccess(editTarget ? "Protocol updated!" : "Protocol added!");
 				setShowModal(false);
-				fetchProtocols();
+				fetchData();
 				setTimeout(() => setSuccess(""), 2500);
 			} else {
 				const d = await res.json();
@@ -116,7 +142,7 @@ export default function ProtocolManagement() {
 			if (res.ok) {
 				setSuccess("Protocol deleted.");
 				setDeleteConfirm(null);
-				fetchProtocols();
+				fetchData();
 				setTimeout(() => setSuccess(""), 2500);
 			}
 		} catch { /* no-op */ }
@@ -169,13 +195,7 @@ export default function ProtocolManagement() {
 				</div>
 			) : protocols.length === 0 ? (
 				<div className="bg-white rounded-3xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-16 text-center">
-					<div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-300 mx-auto mb-4">
-						<svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-						</svg>
-					</div>
 					<p className="font-bold text-slate-500">No protocols yet</p>
-					<p className="text-sm text-slate-400 mt-1">Add test protocols to auto-fill forms when selecting a test type.</p>
 				</div>
 			) : (
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -184,9 +204,6 @@ export default function ProtocolManagement() {
 							key={p.id}
 							className="bg-white p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 hover:border-blue-200 hover:shadow-lg transition-all group relative overflow-hidden"
 						>
-							{/* Hover glow */}
-							<div className="absolute -top-10 -right-10 w-32 h-32 bg-blue-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
 							<div className="flex justify-between items-start mb-4 relative z-10">
 								<div className="flex items-center gap-4">
 									<div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors ${ICON_COLORS[idx % ICON_COLORS.length]}`}>
@@ -195,26 +212,26 @@ export default function ProtocolManagement() {
 										</svg>
 									</div>
 									<div>
-										<h3 className="text-base font-bold text-slate-900">{p.testName}</h3>
+										<h3 className="text-base font-bold text-slate-900">{p.name}</h3>
+										<p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">
+											{p.testType?.name} • {p.testCategory?.name}
+										</p>
 										<div className="flex flex-wrap items-center gap-1.5 mt-1">
 											{(p.productType || "").split(",").map(type => type.trim()).filter(Boolean).map(t => (
-												<span key={t} className="text-[9px] font-bold bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded border border-blue-100">
+												<span key={t} className="text-[9px] font-bold bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded border border-slate-200">
 													{t}
 												</span>
 											))}
-											<p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider ml-1">
-												PRT-{String(p.id).padStart(3, "0")}
-											</p>
 										</div>
 									</div>
 								</div>
 								<div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-									<button onClick={() => openEdit(p)} className="p-2 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Edit">
+									<button onClick={() => openEdit(p)} className="p-2 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors">
 										<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
 										</svg>
 									</button>
-									<button onClick={() => setDeleteConfirm(p.id)} className="p-2 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Delete">
+									<button onClick={() => setDeleteConfirm(p.id)} className="p-2 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors">
 										<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
 										</svg>
@@ -222,49 +239,32 @@ export default function ProtocolManagement() {
 								</div>
 							</div>
 
-							{/* Criteria Preview */}
-							<p className="text-sm text-slate-500 mb-4 line-clamp-2 relative z-10 leading-relaxed">
+							<p className="text-sm text-slate-500 mb-4 line-clamp-2 leading-relaxed">
 								{p.judgementCriteria}
 							</p>
 
-							<div className="flex items-center justify-between pt-4 border-t border-slate-100 relative z-10">
+							<div className="flex items-center justify-between pt-4 border-t border-slate-100">
 								<span className="text-xs font-semibold text-slate-400 bg-slate-50 px-3 py-1.5 rounded-lg">
-									{new Date(p.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+									{new Date(p.createdAt).toLocaleDateString()}
 								</span>
 								<button
 									onClick={() => setExpandedId(expandedId === p.id ? null : p.id)}
 									className="text-sm font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 transition-colors"
 								>
 									{expandedId === p.id ? "Collapse" : "View Details"}
-									<svg className={`w-4 h-4 transition-transform ${expandedId === p.id ? "rotate-90" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-									</svg>
 								</button>
 							</div>
 
-							{/* Expanded Detail */}
 							{expandedId === p.id && (
-								<div className="mt-4 pt-4 border-t border-slate-100 space-y-3 relative z-10 animate-in fade-in duration-200">
-									{p.testPurpose && (
-										<div>
-											<p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">Test Purpose</p>
-											<p className="text-sm text-slate-600 leading-relaxed">{p.testPurpose}</p>
-										</div>
-									)}
+								<div className="mt-4 pt-4 border-t border-slate-100 space-y-3 animate-in fade-in duration-200">
 									<div>
 										<p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">Test Method / Condition</p>
-										<p className="text-sm text-slate-600 leading-relaxed">{p.testMethod || "—"}</p>
+										<p className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap">{p.testMethod || "—"}</p>
 									</div>
 									<div>
 										<p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">Judgement Criteria</p>
-										<p className="text-sm text-slate-600 leading-relaxed">{p.judgementCriteria}</p>
+										<p className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap">{p.judgementCriteria}</p>
 									</div>
-									{p.testDuration && (
-										<div>
-											<p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">Duration</p>
-											<p className="text-sm text-slate-600 leading-relaxed">{p.testDuration}</p>
-										</div>
-									)}
 								</div>
 							)}
 						</div>
@@ -275,14 +275,9 @@ export default function ProtocolManagement() {
 			{/* Add / Edit Modal */}
 			{showModal && (
 				<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-					<div className="bg-white rounded-3xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
-						<div className="bg-slate-900 px-8 py-5 flex justify-between items-center rounded-t-3xl sticky top-0 z-10">
-							<h3 className="text-white font-bold flex items-center gap-2">
-								<svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-								</svg>
-								{editTarget ? "Edit Protocol" : "Add New Protocol"}
-							</h3>
+					<div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+						<div className="bg-slate-900 px-8 py-5 flex justify-between items-center sticky top-0 z-10">
+							<h3 className="text-white font-bold">{editTarget ? "Edit Protocol" : "Add New Protocol"}</h3>
 							<button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-white transition-colors">
 								<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -290,21 +285,52 @@ export default function ProtocolManagement() {
 							</button>
 						</div>
 						<form onSubmit={handleSave} className="p-8 space-y-5">
-							{error && (
-								<div className="bg-red-50 text-red-600 px-4 py-3 rounded-xl text-sm border border-red-100 font-medium">{error}</div>
-							)}
+							{error && <div className="bg-red-50 text-red-600 px-4 py-3 rounded-xl text-sm border border-red-100 font-medium">{error}</div>}
+							
+							<div>
+								<label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">Protocol Name <span className="text-red-500">*</span></label>
+								<input 
+									type="text" 
+									value={form.name} 
+									onChange={(e) => set("name", e.target.value)} 
+									autoFocus 
+									className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm font-bold" 
+									placeholder="e.g. Wash Motor Endurance Test" 
+								/>
+							</div>
+
 							<div className="grid grid-cols-2 gap-5">
 								<div>
-									<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Test Name <span className="text-red-500">*</span></label>
-									<input type="text" value={form.testName} onChange={(e) => set("testName", e.target.value)} autoFocus className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm" placeholder="e.g. TR, Temperature rise test: Wash" />
+									<label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">Test Type <span className="text-red-500">*</span></label>
+									<select
+										value={form.testTypeId}
+										onChange={(e) => set("testTypeId", e.target.value)}
+										className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm font-bold"
+									>
+										<option value="">Select Type...</option>
+										{testTypes.map(t => (
+											<option key={t.id} value={t.id}>{t.name}</option>
+										))}
+									</select>
 								</div>
 								<div>
-									<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Duration</label>
-									<input type="text" value={form.testDuration} onChange={(e) => set("testDuration", e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm" placeholder="e.g. 4 Hours" />
+									<label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">Test Category <span className="text-red-500">*</span></label>
+									<select
+										value={form.testCategoryId}
+										onChange={(e) => set("testCategoryId", e.target.value)}
+										disabled={!form.testTypeId}
+										className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm font-bold disabled:opacity-50"
+									>
+										<option value="">Select Category...</option>
+										{filteredCategories.map(c => (
+											<option key={c.id} value={c.id}>{c.name}</option>
+										))}
+									</select>
 								</div>
 							</div>
+
 							<div>
-								<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Product Type <span className="text-red-500">*</span></label>
+								<label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">Product Type <span className="text-red-500">*</span></label>
 								<div className="grid grid-cols-3 gap-3">
 									{["SATL", "FATL", "FAFL"].map((type) => {
 										const isSelected = form.productType.split(",").map(t => t.trim()).includes(type);
@@ -313,34 +339,31 @@ export default function ProtocolManagement() {
 												key={type}
 												type="button"
 												onClick={() => toggleType(type)}
-												className={`py-2.5 rounded-xl text-xs font-bold transition-all border ${
+												className={`py-3 rounded-2xl text-[10px] font-black transition-all border-2 ${
 													isSelected
-														? "bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-500/20 scale-[1.02]"
-														: "bg-white border-slate-200 text-slate-500 hover:border-blue-300"
+														? "bg-slate-900 border-slate-900 text-white shadow-xl shadow-slate-900/20"
+														: "bg-white border-slate-100 text-slate-400 hover:border-slate-300"
 												}`}
 											>
-												{isSelected && "✓ "}{type}
+												{type}
 											</button>
 										);
 									})}
 								</div>
 							</div>
+
 							<div>
-								<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Test Purpose</label>
-								<textarea rows={3} value={form.testPurpose} onChange={(e) => set("testPurpose", e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm" placeholder="e.g. Verify thermal limits and structural integrity..." />
+								<label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">Test Method / Condition <span className="text-red-500">*</span></label>
+								<textarea rows={4} value={form.testMethod} onChange={(e) => set("testMethod", e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm font-medium" placeholder="e.g. Set wash timer for 15 mins..." />
 							</div>
 							<div>
-								<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Test Method / Condition <span className="text-red-500">*</span></label>
-								<textarea rows={3} value={form.testMethod} onChange={(e) => set("testMethod", e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm" placeholder="e.g. Measure the contact resistance using..." />
-							</div>
-							<div>
-								<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Judgement Criteria <span className="text-red-500">*</span></label>
-								<textarea rows={3} value={form.judgementCriteria} onChange={(e) => set("judgementCriteria", e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm" placeholder="e.g. Max temp rise allowed 75°C" />
+								<label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">Judgement Criteria <span className="text-red-500">*</span></label>
+								<textarea rows={4} value={form.judgementCriteria} onChange={(e) => set("judgementCriteria", e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm font-medium" placeholder="e.g. Motor must complete 1000 cycles without failure..." />
 							</div>
 							<div className="flex justify-end gap-3 pt-2">
-								<button type="button" onClick={() => setShowModal(false)} className="px-5 py-2.5 rounded-xl font-semibold text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all text-sm">Cancel</button>
-								<button type="submit" disabled={saving} className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-slate-400 disabled:to-slate-400 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg shadow-blue-500/20 transition-all text-sm flex items-center gap-2">
-									{saving ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Saving...</> : (editTarget ? "Update Protocol" : "Add Protocol")}
+								<button type="button" onClick={() => setShowModal(false)} className="px-6 py-3 rounded-2xl font-bold text-slate-400 hover:bg-slate-50 transition-all text-sm">Cancel</button>
+								<button type="submit" disabled={saving} className="bg-slate-900 text-white font-bold py-3 px-10 rounded-2xl shadow-2xl shadow-slate-900/30 transition-all text-sm hover:bg-slate-800 disabled:bg-slate-400">
+									{saving ? "Saving..." : (editTarget ? "Update Protocol" : "Add Protocol")}
 								</button>
 							</div>
 						</form>
@@ -351,17 +374,16 @@ export default function ProtocolManagement() {
 			{/* Delete Confirm */}
 			{deleteConfirm !== null && (
 				<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-					<div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8 animate-in fade-in zoom-in-95 duration-200 text-center">
-						<div className="w-14 h-14 rounded-2xl bg-red-100 flex items-center justify-center text-red-600 mx-auto mb-5">
-							<svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-sm p-8 text-center animate-in zoom-in-95 duration-200">
+						<div className="w-16 h-16 rounded-full bg-rose-50 flex items-center justify-center text-rose-500 mx-auto mb-4">
+							<svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
 							</svg>
 						</div>
-						<h3 className="text-lg font-bold text-slate-900 mb-2">Delete Protocol?</h3>
-						<p className="text-sm text-slate-500 mb-6">This action cannot be undone.</p>
-						<div className="flex gap-3">
-							<button onClick={() => setDeleteConfirm(null)} className="flex-1 px-4 py-2.5 rounded-xl font-semibold text-slate-600 border border-slate-200 hover:bg-slate-50 text-sm">Cancel</button>
-							<button onClick={() => handleDelete(deleteConfirm)} className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-sm">Delete</button>
+						<h3 className="text-xl font-bold text-slate-900 mb-2">Delete Protocol?</h3>
+						<div className="flex gap-3 mt-6">
+							<button onClick={() => setDeleteConfirm(null)} className="flex-1 px-4 py-3 rounded-2xl font-bold text-slate-400 hover:bg-slate-50 text-sm transition-all">Cancel</button>
+							<button onClick={() => handleDelete(deleteConfirm)} className="flex-1 bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 rounded-2xl text-sm transition-all shadow-lg shadow-rose-500/20">Delete</button>
 						</div>
 					</div>
 				</div>
