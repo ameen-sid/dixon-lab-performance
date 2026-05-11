@@ -33,7 +33,7 @@ export async function POST(req: Request) {
 				problem,
 				rootCause,
 				actionTaken,
-				submittedById: user.id
+				submittedById: user.userId
 			}
 		});
 

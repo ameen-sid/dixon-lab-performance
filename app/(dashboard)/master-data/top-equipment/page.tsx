@@ -9,9 +9,14 @@ type TopEquipment = {
 	createdAt: string;
 };
 
-const EMPTY_FORM = {
+type EquipmentForm = {
+	name: string;
+	status: TopEquipment["status"];
+};
+
+const EMPTY_FORM: EquipmentForm = {
 	name: "",
-	status: "AVAILABLE" as const,
+	status: "AVAILABLE",
 };
 
 export default function TopEquipmentManagement() {
@@ -19,7 +24,7 @@ export default function TopEquipmentManagement() {
 	const [loading, setLoading] = useState(true);
 	const [showModal, setShowModal] = useState(false);
 	const [editTarget, setEditTarget] = useState<TopEquipment | null>(null);
-	const [form, setForm] = useState({ ...EMPTY_FORM });
+	const [form, setForm] = useState<EquipmentForm>({ ...EMPTY_FORM });
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState("");
 	const [success, setSuccess] = useState("");
