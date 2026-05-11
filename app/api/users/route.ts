@@ -15,8 +15,8 @@ export async function POST(req: Request) {
 			);
 		}
 
-		// Validation: Roles other than SUPER_ADMIN must have a department
-		if (role !== "SUPER_ADMIN" && !departmentId) {
+		// Validation: Roles other than Admin/CEO/SUPER_ADMIN must have a department
+		if (!["SUPER_ADMIN", "Admin", "CEO", "ceo"].includes(role) && !departmentId) {
 			return NextResponse.json(
 				{ error: `Users with the '${role}' role must be assigned to a department.` },
 				{ status: 400 },

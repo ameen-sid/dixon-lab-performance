@@ -37,8 +37,8 @@ export default function SuppliersPage() {
 	}, [fetchSuppliers]);
 
 	const filteredSuppliers = useMemo(() => {
-		return suppliers.filter(s => 
-			s.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+		return suppliers.filter(s =>
+			s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
 			s.id.toString().includes(searchQuery)
 		);
 	}, [suppliers, searchQuery]);

@@ -49,12 +49,24 @@ export default function TestCategoryManagement() {
 	}, [fetchData]);
 
 	const filteredCategories = useMemo(() => {
-		return categories.filter(c => 
-			c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+		return categories.filter(c =>
+			c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
 			c.slNo?.toString().includes(searchQuery) ||
 			c.testType?.name.toLowerCase().includes(searchQuery.toLowerCase())
 		);
 	}, [categories, searchQuery]);
+
+	const [currentPage, setCurrentPage] = useState(1);
+	const itemsPerPage = 10;
+
+	const paginatedCategories = useMemo(() => {
+		const start = (currentPage - 1) * itemsPerPage;
+		return filteredCategories.slice(start, start + itemsPerPage);
+	}, [filteredCategories, currentPage]);
+
+	const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
+
+	useEffect(() => { setCurrentPage(1); }, [searchQuery]);
 
 	const openAdd = () => {
 		setEditTarget(null);
@@ -85,7 +97,7 @@ export default function TestCategoryManagement() {
 			const res = await fetch(url, {
 				method,
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ 
+				body: JSON.stringify({
 					name: nameInput.trim(),
 					slNo: slNoInput ? parseInt(slNoInput) : null,
 					testTypeId: testTypeIdInput ? parseInt(testTypeIdInput) : null
@@ -191,7 +203,7 @@ export default function TestCategoryManagement() {
 									</td>
 								</tr>
 							) : (
-								filteredCategories.map((c) => (
+								paginatedCategories.map((c) => (
 									<tr key={c.id} className="hover:bg-slate-50/50 transition-colors group">
 										<td className="px-6 py-4 font-mono text-sm text-slate-500">
 											{c.slNo ? String(c.slNo).padStart(2, "0") : "—"}
@@ -234,6 +246,31 @@ export default function TestCategoryManagement() {
 						</tbody>
 					</table>
 				</div>
+
+				{/* Pagination Footer */}
+				{totalPages > 1 && (
+					<div className="px-8 py-4 border-t border-slate-100 flex items-center justify-between bg-slate-50/30">
+						<p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+							Page {currentPage} of {totalPages}
+						</p>
+						<div className="flex gap-2">
+							<button
+								disabled={currentPage === 1}
+								onClick={() => setCurrentPage(p => p - 1)}
+								className="px-4 py-2 rounded-xl border border-slate-200 text-[10px] font-black uppercase tracking-widest bg-white disabled:opacity-30 hover:bg-slate-50 transition-colors"
+							>
+								Previous
+							</button>
+							<button
+								disabled={currentPage === totalPages}
+								onClick={() => setCurrentPage(p => p + 1)}
+								className="px-4 py-2 rounded-xl border border-slate-200 text-[10px] font-black uppercase tracking-widest bg-white disabled:opacity-30 hover:bg-slate-50 transition-colors"
+							>
+								Next
+							</button>
+						</div>
+					</div>
+				)}
 			</div>
 
 			{/* Modal with Test Type Dropdown */}
@@ -252,7 +289,7 @@ export default function TestCategoryManagement() {
 						</div>
 						<form onSubmit={handleSave} className="p-8 space-y-5">
 							{error && <div className="bg-red-50 text-red-600 px-4 py-3 rounded-xl text-sm border border-red-100 font-medium">{error}</div>}
-							
+
 							<div>
 								<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Parent Test Type</label>
 								<select

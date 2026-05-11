@@ -7,7 +7,7 @@ export default function StatusFilter() {
 	const searchParams = useSearchParams();
 	const currentStatus = searchParams.get("status") || "All";
 
-	const statuses = ["All", "Pending", "Approved", "Rejected", "Completed"];
+	const statuses = ["All", "Pending", "Approved", "Rejected"];
 
 	const handleStatusChange = (status: string) => {
 		const params = new URLSearchParams(searchParams.toString());
@@ -16,20 +16,20 @@ export default function StatusFilter() {
 		} else {
 			params.set("status", status);
 		}
+		params.set("page", "1"); // Reset to page 1 on filter
 		router.push(`?${params.toString()}`);
 	};
 
 	return (
-		<div className="flex bg-slate-100 p-1 rounded-xl gap-1">
+		<div className="flex bg-white p-1 rounded-xl border border-slate-200 shadow-sm gap-1">
 			{statuses.map((status) => (
 				<button
 					key={status}
 					onClick={() => handleStatusChange(status)}
-					className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
-						currentStatus === status
-							? "bg-white text-slate-900 shadow-sm"
-							: "text-slate-500 hover:text-slate-700"
-					}`}
+					className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${currentStatus === status
+							? "bg-slate-900 text-white shadow-sm"
+							: "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
+						}`}
 				>
 					{status}
 				</button>

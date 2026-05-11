@@ -23,9 +23,19 @@ export async function PUT(
 				endDate: new Date(body.endDate),
 				remarks: body.remarks,
 				stationIds: body.stationIds,
-				status: body.status,
+				status: body.retestFlag ? "PLANNED" : body.status,
+				retestFlag: body.retestFlag ? false : undefined,
 			},
 		});
+
+		// Update station status if stations were selected
+		if (body.stationIds) {
+			const sids = body.stationIds.split(",");
+			await prisma.station.updateMany({
+				where: { id: { in: sids } },
+				data: { status: "OCCUPIED" }
+			});
+		}
 
 		return NextResponse.json(updated);
 	} catch (error) {

@@ -17,13 +17,11 @@ export async function PATCH(
 		const body = await req.json();
 		const { name, username, password, role, departmentId } = body;
 
-		// Validation: Roles other than SUPER_ADMIN must have a department
-		// Only validate if role or departmentId is being changed
-		if ((role && role !== "SUPER_ADMIN" && !departmentId) || (departmentId && role !== "SUPER_ADMIN" && !departmentId)) {
-			// This is a bit tricky on PATCH since we might not have the other field in the body
-			// We might need to fetch the existing user if we want perfect validation on PATCH
-			// For now, let's assume the frontend sends what's needed or we validate against the role in body
-			if (role && role !== "SUPER_ADMIN" && !departmentId) {
+		// Validation: Roles other than Admin/CEO/SUPER_ADMIN must have a department
+		const isExempt = (r: string) => ["SUPER_ADMIN", "Admin", "CEO", "ceo"].includes(r);
+		
+		if ((role && !isExempt(role) && !departmentId) || (departmentId === null && role && !isExempt(role))) {
+			if (role && !isExempt(role) && !departmentId) {
 				const existingUser = await prisma.user.findUnique({ where: { id } });
 				if (existingUser && !existingUser.departmentId) {
 					return NextResponse.json(

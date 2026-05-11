@@ -39,8 +39,8 @@ export default function ProductsPage() {
 	}, [fetchProducts]);
 
 	const filteredProducts = useMemo(() => {
-		return products.filter(p => 
-			p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+		return products.filter(p =>
+			p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
 			(p.partNo && p.partNo.toLowerCase().includes(searchQuery.toLowerCase())) ||
 			p.id.toString().includes(searchQuery)
 		);
@@ -73,9 +73,9 @@ export default function ProductsPage() {
 				{
 					method: editTarget ? "PUT" : "POST",
 					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ 
+					body: JSON.stringify({
 						name: nameInput.trim(),
-						partNo: partNoInput.trim() || null 
+						partNo: partNoInput.trim() || null
 					}),
 				},
 			);

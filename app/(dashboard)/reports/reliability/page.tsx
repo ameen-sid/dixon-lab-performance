@@ -146,14 +146,13 @@ export default function ReliabilityReports() {
 							<button
 								key={f}
 								onClick={() => setStatusFilter(f)}
-								className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all ${
-									statusFilter === f
+								className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all ${statusFilter === f
 										? f === "ALL" ? "bg-slate-900 text-white border-slate-900"
-										: f === "ONGOING" ? "bg-blue-600 text-white border-blue-600"
-										: f === "COMPLETED" ? "bg-emerald-600 text-white border-emerald-600"
-										: "bg-red-600 text-white border-red-600"
+											: f === "ONGOING" ? "bg-blue-600 text-white border-blue-600"
+												: f === "COMPLETED" ? "bg-emerald-600 text-white border-emerald-600"
+													: "bg-red-600 text-white border-red-600"
 										: "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
-								}`}
+									}`}
 							>
 								{f}
 							</button>

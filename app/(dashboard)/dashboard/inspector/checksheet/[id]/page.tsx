@@ -148,9 +148,7 @@ export default function ChecksheetPage({ params }: { params: Promise<{ id: strin
 						</div>
 					</div>
 					<div className="col-span-4 p-4 flex flex-col justify-center items-center">
-						<div className="text-[32px] font-black italic tracking-tighter leading-none text-slate-900 select-none">
-							D<span className="text-blue-600">I</span>XON
-						</div>
+						<img src="/logo.png" alt="Dixon Logo" className="h-10 w-auto object-contain" />
 						<div className="mt-2 text-[10px] font-black uppercase text-slate-400 tracking-[0.3em]">Reliability Lab</div>
 					</div>
 				</div>

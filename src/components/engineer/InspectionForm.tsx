@@ -31,17 +31,12 @@ export default function InspectionForm({ request, user, onSubmit }: Props) {
 		e.preventDefault();
 		setLoading(true);
 		const formData = new FormData(e.currentTarget);
-		
+
 		// If we have a preview but no new file, it might be the old one. 
 		// The server action handles the image URL update.
-		
-		try {
-			await onSubmit(formData);
-		} catch (error) {
-			alert("Failed to submit inspection");
-		} finally {
-			setLoading(false);
-		}
+
+		await onSubmit(formData);
+		setLoading(false);
 	};
 
 	const checkPoints = [
@@ -61,7 +56,7 @@ export default function InspectionForm({ request, user, onSubmit }: Props) {
 			<div className="mb-8 flex justify-between items-end">
 				<div>
 					<Link
-						href="/dashboard/engineer/samples"
+						href={user.role === "Lab Manager" ? "/dashboard/manager/requests" : "/dashboard/engineer/samples"}
 						className="text-sm font-semibold text-slate-500 hover:text-blue-600 flex items-center gap-1 mb-4 transition-colors"
 					>
 						<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -120,19 +115,19 @@ export default function InspectionForm({ request, user, onSubmit }: Props) {
 										</td>
 									</tr>
 								))}
-								
+
 								<tr className="bg-slate-50/30">
 									<td className="px-6 py-5 text-sm font-bold text-slate-400 text-center">10</td>
 									<td className="px-6 py-5 text-sm font-medium text-slate-700 font-bold uppercase tracking-tight">Sample Id allotted</td>
 									<td className="px-6 py-5">
-										<input 
-											type="text" 
-											name="point10" 
+										<input
+											type="text"
+											name="point10"
 											required
 											disabled={isViewOnly}
 											defaultValue={request.inspection?.allottedId || request.samplePartNo || ""}
 											placeholder="Enter ID..."
-											className="w-full px-3 py-2 text-xs font-bold bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 outline-none" 
+											className="w-full px-3 py-2 text-xs font-bold bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 outline-none"
 										/>
 									</td>
 								</tr>
@@ -140,13 +135,13 @@ export default function InspectionForm({ request, user, onSubmit }: Props) {
 									<td className="px-6 py-5 text-sm font-bold text-slate-400 text-center">11</td>
 									<td className="px-6 py-5 text-sm font-medium text-slate-700 font-bold uppercase tracking-tight">Remarks (If any)</td>
 									<td className="px-6 py-5">
-										<textarea 
-											name="point11" 
+										<textarea
+											name="point11"
 											rows={2}
 											disabled={isViewOnly}
 											defaultValue={request.inspection?.remarks || ""}
 											placeholder="Add notes..."
-											className="w-full px-3 py-2 text-xs font-bold bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 outline-none resize-none" 
+											className="w-full px-3 py-2 text-xs font-bold bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 outline-none resize-none"
 										/>
 									</td>
 								</tr>
@@ -154,18 +149,27 @@ export default function InspectionForm({ request, user, onSubmit }: Props) {
 									<td className="px-6 py-5 text-sm font-bold text-slate-400 text-center">12</td>
 									<td className="px-6 py-5 text-sm font-medium text-slate-700 font-bold uppercase tracking-tight">Sample Picture upload</td>
 									<td className="px-6 py-5">
-										<div 
+										<div
 											onClick={() => !isViewOnly && fileInputRef.current?.click()}
-											className={`w-full h-32 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center bg-white group transition-all relative overflow-hidden ${
-												isViewOnly ? "border-slate-100 cursor-default" : "border-slate-200 cursor-pointer hover:border-blue-300"
-											}`}
+											className={`w-full h-32 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center bg-white group transition-all relative overflow-hidden ${isViewOnly ? "border-slate-100 cursor-default" : "border-slate-200 cursor-pointer hover:border-blue-300"
+												}`}
 										>
 											{imagePreview ? (
-												<img 
-													src={imagePreview} 
-													alt="Preview" 
-													className="w-full h-full object-cover"
-												/>
+												<div 
+													onClick={(e) => {
+														if (isViewOnly && imagePreview) {
+															e.stopPropagation();
+															window.open(imagePreview, "_blank");
+														}
+													}}
+													className={`w-full h-full relative group/img ${isViewOnly ? "cursor-pointer" : ""}`}
+												>
+													<img
+														src={imagePreview}
+														alt="Preview"
+														className="w-full h-full object-cover transition-transform duration-700 ease-in-out group-hover/img:scale-110"
+													/>
+												</div>
 											) : (
 												<>
 													<svg className="w-6 h-6 text-slate-300 group-hover:text-blue-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -176,8 +180,8 @@ export default function InspectionForm({ request, user, onSubmit }: Props) {
 													</span>
 												</>
 											)}
-											<input 
-												type="file" 
+											<input
+												type="file"
 												name="samplePic"
 												ref={fileInputRef}
 												onChange={handleFileChange}

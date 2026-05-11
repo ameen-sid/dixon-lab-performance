@@ -8,7 +8,7 @@ export async function GET() {
 
 		const tests = await prisma.testPlan.findMany({
 			where: {
-				status: { in: ["PLANNED", "ONGOING"] },
+				status: { in: ["PLANNED", "ONGOING", "COMPLETED"] },
 				startDate: { lte: new Date() } // On or after scheduled date
 			},
 			include: {

@@ -181,9 +181,7 @@ export default function ReliabilityChronologySheet({ params }: { params: Promise
 						</div>
 						<div className="flex items-center justify-between mt-4">
 							<div className="h-8 flex items-center px-3 border border-black rounded font-black text-[10px] bg-slate-200">Result:- Ongoing</div>
-							<div className="text-[32px] font-black italic tracking-tighter leading-none text-slate-900 select-none">
-								D<span className="text-blue-600">I</span>XON
-							</div>
+							<img src="/logo.png" alt="Dixon Logo" className="h-10 w-auto object-contain" />
 						</div>
 					</div>
 				</div>

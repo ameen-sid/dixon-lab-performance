@@ -37,8 +37,8 @@ export default function DepartmentsPage() {
 	}, [fetchDepartments]);
 
 	const filteredDepartments = useMemo(() => {
-		return departments.filter(d => 
-			d.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+		return departments.filter(d =>
+			d.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
 			d.id.toString().includes(searchQuery)
 		);
 	}, [departments, searchQuery]);

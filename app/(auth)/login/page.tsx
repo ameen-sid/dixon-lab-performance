@@ -32,6 +32,8 @@ export default function LoginPage() {
 					router.push("/dashboard/manager");
 				} else if (role === "Engineer") {
 					router.push("/dashboard/engineer");
+				} else if (role === "CEO" || role === "ceo") {
+					router.push("/dashboard/ceo");
 				} else if (role === "Head") {
 					router.push("/dashboard"); // Head usually goes to main overview
 				} else if (role === "Admin") {
@@ -39,7 +41,7 @@ export default function LoginPage() {
 				} else {
 					router.push("/dashboard");
 				}
-				
+
 				router.refresh();
 			} else {
 				const data = await res.json();
@@ -61,29 +63,9 @@ export default function LoginPage() {
 			<div className="w-full max-w-md relative z-10 px-6">
 				{/* Header Section */}
 				<div className="text-center mb-10">
-					<div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 shadow-lg shadow-blue-500/30 mb-6 text-white transform hover:scale-105 transition-transform duration-300">
-						{/* Modern Shield Icon */}
-						<svg
-							className="w-8 h-8"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth={2}
-								d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-							/>
-						</svg>
+					<div className="flex justify-center mb-6">
+						<img src="/logo.png" alt="Dixon Logo" className="h-20 w-auto object-contain transform hover:scale-105 transition-transform duration-300 drop-shadow-md" />
 					</div>
-					<h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-						DIXON
-					</h1>
-					<p className="text-slate-500 mt-2 font-medium">
-						Reliability Testing Portal
-					</p>
 				</div>
 
 				{/* Glassmorphism Form Card */}

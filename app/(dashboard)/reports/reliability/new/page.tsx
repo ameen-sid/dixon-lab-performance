@@ -81,8 +81,8 @@ export default function NewReliabilityCycle() {
 	useEffect(() => {
 		if (form.nameOfTest) {
 			// Find protocol matching both name AND product type
-			const prot = protocols.find((p) => 
-				p.testName === form.nameOfTest && 
+			const prot = protocols.find((p) =>
+				p.testName === form.nameOfTest &&
 				(p.productType || "").split(",").map(t => t.trim()).includes(form.productType)
 			);
 			if (prot) {
@@ -178,7 +178,7 @@ export default function NewReliabilityCycle() {
 			if (!groups[s.platformId]) groups[s.platformId] = [];
 			groups[s.platformId].push(s);
 		});
-		
+
 		return Object.entries(groups).map(([id, stns]) => ({
 			id,
 			stations: stns.sort((a, b) => {
@@ -303,9 +303,9 @@ export default function NewReliabilityCycle() {
 								</div>
 								<div>
 									<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Name of Test <span className="text-red-500">*</span></label>
-									<select 
-										value={form.nameOfTest} 
-										onChange={(e) => handleChange("nameOfTest", e.target.value)} 
+									<select
+										value={form.nameOfTest}
+										onChange={(e) => handleChange("nameOfTest", e.target.value)}
 										className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm font-semibold appearance-none"
 									>
 										<option value="">Select Test Category...</option>
@@ -426,9 +426,9 @@ export default function NewReliabilityCycle() {
 															onClick={() => toggleStation(s.id, s.status)}
 															className={`
 																aspect-square rounded-xl text-[10px] font-black transition-all flex flex-col items-center justify-center border-2
-																${isOccupied ? "bg-slate-50 border-slate-100 text-slate-200 cursor-not-allowed opacity-40 shadow-none" : 
-																  isSelected ? "bg-blue-600 border-blue-400 text-white scale-110 shadow-xl shadow-blue-500/30" : 
-																  "bg-white border-slate-100 text-slate-400 hover:border-blue-400 hover:text-blue-500 hover:bg-blue-50/30"}
+																${isOccupied ? "bg-slate-50 border-slate-100 text-slate-200 cursor-not-allowed opacity-40 shadow-none" :
+																	isSelected ? "bg-blue-600 border-blue-400 text-white scale-110 shadow-xl shadow-blue-500/30" :
+																		"bg-white border-slate-100 text-slate-400 hover:border-blue-400 hover:text-blue-500 hover:bg-blue-50/30"}
 															`}
 															title={isOccupied ? "Occupied" : `Station ${s.id}`}
 														>

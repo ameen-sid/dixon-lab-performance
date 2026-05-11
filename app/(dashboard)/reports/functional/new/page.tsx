@@ -448,9 +448,9 @@ export default function NewFunctionalTest() {
 								<div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 									<div>
 										<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Instrument <span className="text-red-500">*</span></label>
-										<select 
-											value={form.instrument} 
-											onChange={(e) => set("instrument", e.target.value)} 
+										<select
+											value={form.instrument}
+											onChange={(e) => set("instrument", e.target.value)}
 											className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm appearance-none"
 										>
 											<option value="">Select instrument...</option>

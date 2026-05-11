@@ -48,8 +48,8 @@ export default function InspectorTestsPage() {
 					</div>
 				) : (
 					tests.map((test) => (
-						<Link 
-							key={test.id} 
+						<Link
+							key={test.id}
 							href={`/dashboard/inspector/checksheet/${test.id}`}
 							className="bg-white rounded-[2rem] border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:shadow-blue-200/50 transition-all group flex flex-col justify-between"
 						>

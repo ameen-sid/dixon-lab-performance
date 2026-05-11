@@ -102,10 +102,8 @@ export default function FunctionalTestReport({ params }: { params: Promise<{ id:
 						{test.testName} Test Report:-
 					</h1>
 					<div className="text-right">
-						<div className="text-4xl font-black tracking-tighter text-slate-900 print:text-black italic">
-							D<span className="text-blue-600 italic">I</span>XON
-						</div>
-						<p className="text-[10px] font-black text-slate-400 print:text-slate-500 uppercase tracking-widest -mt-1">
+						<img src="/logo.png" alt="Dixon Logo" className="h-10 w-auto object-contain ml-auto" />
+						<p className="text-[10px] font-black text-slate-400 print:text-slate-500 uppercase tracking-widest mt-1">
 							The brand behind brands
 						</p>
 					</div>

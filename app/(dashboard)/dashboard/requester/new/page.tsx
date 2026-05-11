@@ -9,7 +9,7 @@ export default async function NewRequestPage() {
 
 	async function createRequest(formData: FormData) {
 		"use server";
-		
+
 		const samplePartName = formData.get("samplePartName") as string;
 		const samplePartNo = formData.get("samplePartNo") as string;
 		const customerSupplierName = formData.get("customerSupplierName") as string;

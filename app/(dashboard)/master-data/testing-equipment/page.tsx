@@ -47,8 +47,8 @@ export default function TestingEquipmentPage() {
 	}, [fetchEquipment]);
 
 	const filteredEquipment = useMemo(() => {
-		return equipment.filter(e => 
-			e.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+		return equipment.filter(e =>
+			e.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
 			e.slNo?.toString().includes(searchQuery)
 		);
 	}, [equipment, searchQuery]);
@@ -220,8 +220,8 @@ export default function TestingEquipmentPage() {
 												</span>
 											</td>
 											<td className="px-6 py-4 text-sm text-slate-500">
-												{item.calibrationDueDate 
-													? format(parseISO(item.calibrationDueDate), "dd MMM yyyy") 
+												{item.calibrationDueDate
+													? format(parseISO(item.calibrationDueDate), "dd MMM yyyy")
 													: "Not Set"}
 											</td>
 											<td className="px-6 py-4">

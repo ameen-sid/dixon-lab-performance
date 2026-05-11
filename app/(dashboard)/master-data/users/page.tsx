@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 
 type User = {
 	id: number;
@@ -17,15 +17,16 @@ type Department = {
 	name: string;
 };
 
-const ROLES = ["SUPER_ADMIN", "ADMIN", "MANAGER", "ENGINEER", "TEST_REQUESTER", "OPERATOR"];
+const ROLES = ["Admin", "CEO", "Head", "Lab Manager", "Engineer", "Inspector", "Requester"];
 
 const ROLE_STYLE: Record<string, string> = {
-	SUPER_ADMIN: "bg-black text-white border-black",
-	ADMIN: "bg-violet-100 text-violet-700 border-violet-200",
-	MANAGER: "bg-blue-100 text-blue-700 border-blue-200",
-	ENGINEER: "bg-emerald-100 text-emerald-700 border-emerald-200",
-	TEST_REQUESTER: "bg-amber-100 text-amber-700 border-amber-200",
-	OPERATOR: "bg-slate-100 text-slate-600 border-slate-200",
+	Admin: "bg-black text-white border-black",
+	CEO: "bg-blue-600 text-white border-blue-700 shadow-sm",
+	Head: "bg-violet-100 text-violet-700 border-violet-200",
+	"Lab Manager": "bg-blue-100 text-blue-700 border-blue-200",
+	Engineer: "bg-emerald-100 text-emerald-700 border-emerald-200",
+	Inspector: "bg-indigo-100 text-indigo-700 border-indigo-200",
+	Requester: "bg-amber-100 text-amber-700 border-amber-200",
 };
 
 const AVATAR_COLORS = [
@@ -49,14 +50,39 @@ export default function UserManagementPage() {
 	const [editingUser, setEditingUser] = useState<User | null>(null);
 	const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
+	const [search, setSearch] = useState("");
+	const [roleFilter, setRoleFilter] = useState("");
+	const [deptFilter, setDeptFilter] = useState("");
+	const [currentPage, setCurrentPage] = useState(1);
+	const itemsPerPage = 10;
+
 	const [form, setForm] = useState({
 		name: "",
 		username: "",
 		password: "",
 		confirmPassword: "",
-		role: "OPERATOR",
+		role: "Requester",
 		departmentId: "",
 	});
+
+	const filteredUsers = useMemo(() => {
+		return users.filter(u => {
+			const matchesSearch = u.name.toLowerCase().includes(search.toLowerCase()) ||
+				u.username.toLowerCase().includes(search.toLowerCase());
+			const matchesRole = !roleFilter || u.role === roleFilter;
+			const matchesDept = !deptFilter || u.departmentId?.toString() === deptFilter;
+			return matchesSearch && matchesRole && matchesDept;
+		});
+	}, [users, search, roleFilter, deptFilter]);
+
+	const paginatedUsers = useMemo(() => {
+		const start = (currentPage - 1) * itemsPerPage;
+		return filteredUsers.slice(start, start + itemsPerPage);
+	}, [filteredUsers, currentPage]);
+
+	const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+
+	useEffect(() => { setCurrentPage(1); }, [search, roleFilter, deptFilter]);
 
 	const fetchUsers = useCallback(async () => {
 		setLoading(true);
@@ -102,7 +128,7 @@ export default function UserManagementPage() {
 			});
 		} else {
 			setEditingUser(null);
-			setForm({ name: "", username: "", password: "", confirmPassword: "", role: "OPERATOR", departmentId: "" });
+			setForm({ name: "", username: "", password: "", confirmPassword: "", role: "Requester", departmentId: "" });
 		}
 		setError("");
 		setShowModal(true);
@@ -119,7 +145,7 @@ export default function UserManagementPage() {
 			setError("Name, username and password are required.");
 			return;
 		}
-		if (form.role !== "SUPER_ADMIN" && !form.departmentId) {
+		if (!["Admin", "CEO"].includes(form.role) && !form.departmentId) {
 			setError(`The '${form.role}' role requires a department assignment.`);
 			return;
 		}
@@ -144,7 +170,7 @@ export default function UserManagementPage() {
 					username: form.username,
 					password: form.password || undefined,
 					role: form.role,
-					departmentId: form.departmentId || null,
+					departmentId: form.departmentId ? parseInt(form.departmentId) : null,
 				}),
 			});
 			if (res.ok) {
@@ -194,7 +220,7 @@ export default function UserManagementPage() {
 			year: "numeric",
 		});
 
-	const hasSuperAdmin = users.some(u => u.role === "SUPER_ADMIN");
+	const hasSuperAdmin = users.some(u => u.role === "Admin");
 
 	return (
 		<div className="max-w-6xl mx-auto pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -230,8 +256,8 @@ export default function UserManagementPage() {
 			<div className="grid grid-cols-3 gap-6 mb-8">
 				{[
 					{ label: "Active Directory", value: users.length, color: "bg-slate-50 text-slate-600" },
-					{ label: "Administrative Staff", value: users.filter((u) => ["SUPER_ADMIN", "ADMIN", "MANAGER"].includes(u.role)).length, color: "bg-violet-50 text-violet-600" },
-					{ label: "Technical Staff", value: users.filter((u) => !["SUPER_ADMIN", "ADMIN", "MANAGER"].includes(u.role)).length, color: "bg-blue-50 text-blue-600" },
+					{ label: "Administrative Staff", value: users.filter((u) => ["Admin", "Head", "Lab Manager"].includes(u.role)).length, color: "bg-violet-50 text-violet-600" },
+					{ label: "Technical Staff", value: users.filter((u) => !["Admin", "Head", "Lab Manager"].includes(u.role)).length, color: "bg-blue-50 text-blue-600" },
 				].map((stat) => (
 					<div key={stat.label} className="bg-white rounded-3xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.03)] p-6">
 						<p className="text-3xl font-extrabold text-slate-900 tracking-tight">{stat.value}</p>
@@ -242,11 +268,55 @@ export default function UserManagementPage() {
 
 			{/* User Table */}
 			<div className="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 overflow-hidden">
-				<div className="p-5 border-b border-slate-100 bg-slate-50/50 flex items-center gap-3">
-					<svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-					</svg>
-					<span className="font-bold text-slate-700">{users.length} STAFF MEMBERS RECORDED</span>
+				<div className="p-6 border-b border-slate-100 bg-slate-50/50 flex flex-wrap items-center justify-between gap-4">
+					<div className="flex items-center gap-3">
+						<svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+						</svg>
+						<span className="font-bold text-slate-700 text-sm">{filteredUsers.length} MEMBERS FOUND</span>
+					</div>
+
+					<div className="flex flex-wrap items-center gap-3">
+						<div className="relative">
+							<svg className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+							</svg>
+							<input
+								type="text"
+								placeholder="Search name or user..."
+								value={search}
+								onChange={(e) => setSearch(e.target.value)}
+								className="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:ring-4 focus:ring-blue-500/10 outline-none w-64 transition-all"
+							/>
+						</div>
+
+						<select
+							value={roleFilter}
+							onChange={(e) => setRoleFilter(e.target.value)}
+							className="px-3 py-2 bg-white border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest outline-none focus:ring-4 focus:ring-blue-500/10"
+						>
+							<option value="">All Roles</option>
+							{ROLES.map(r => <option key={r} value={r}>{r}</option>)}
+						</select>
+
+						<select
+							value={deptFilter}
+							onChange={(e) => setDeptFilter(e.target.value)}
+							className="px-3 py-2 bg-white border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest outline-none focus:ring-4 focus:ring-blue-500/10 max-w-[150px]"
+						>
+							<option value="">All Departments</option>
+							{departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+						</select>
+
+						{(search || roleFilter || deptFilter) && (
+							<button
+								onClick={() => { setSearch(""); setRoleFilter(""); setDeptFilter(""); }}
+								className="text-[10px] font-black text-rose-500 uppercase tracking-widest hover:underline"
+							>
+								Clear
+							</button>
+						)}
+					</div>
 				</div>
 				<div className="overflow-x-auto">
 					<table className="w-full text-left border-collapse">
@@ -265,19 +335,19 @@ export default function UserManagementPage() {
 										<td colSpan={4} className="px-6 py-8" />
 									</tr>
 								))
-							) : users.length === 0 ? (
+							) : filteredUsers.length === 0 ? (
 								<tr>
 									<td colSpan={4} className="px-6 py-20 text-center">
 										<div className="flex flex-col items-center gap-3 opacity-30">
 											<svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
 											</svg>
-											<p className="font-bold text-slate-500 uppercase tracking-widest text-xs">No records</p>
+											<p className="font-bold text-slate-500 uppercase tracking-widest text-xs">No users match your filters</p>
 										</div>
 									</td>
 								</tr>
 							) : (
-								users.map((user, idx) => (
+								paginatedUsers.map((user, idx) => (
 									<tr key={user.id} className="hover:bg-slate-50/50 transition-colors group">
 										<td className="px-6 py-4">
 											<div className="flex items-center gap-3">
@@ -292,7 +362,7 @@ export default function UserManagementPage() {
 										</td>
 										<td className="px-6 py-4">
 											<span className="text-sm font-medium text-slate-600">
-												{user.department?.name || (user.role === "SUPER_ADMIN" ? "N/A" : "UNASSIGNED")}
+												{user.department?.name || (["Admin", "CEO"].includes(user.role) ? "N/A" : "UNASSIGNED")}
 											</span>
 										</td>
 										<td className="px-6 py-4">
@@ -328,6 +398,31 @@ export default function UserManagementPage() {
 						</tbody>
 					</table>
 				</div>
+
+				{/* Pagination Footer */}
+				{totalPages > 1 && (
+					<div className="px-8 py-4 border-t border-slate-100 flex items-center justify-between bg-slate-50/30">
+						<p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+							Page {currentPage} of {totalPages}
+						</p>
+						<div className="flex gap-2">
+							<button
+								disabled={currentPage === 1}
+								onClick={() => setCurrentPage(p => p - 1)}
+								className="px-4 py-2 rounded-xl border border-slate-200 text-[10px] font-black uppercase tracking-widest bg-white disabled:opacity-30 hover:bg-slate-50 transition-colors"
+							>
+								Previous
+							</button>
+							<button
+								disabled={currentPage === totalPages}
+								onClick={() => setCurrentPage(p => p + 1)}
+								className="px-4 py-2 rounded-xl border border-slate-200 text-[10px] font-black uppercase tracking-widest bg-white disabled:opacity-30 hover:bg-slate-50 transition-colors"
+							>
+								Next
+							</button>
+						</div>
+					</div>
+				)}
 			</div>
 
 			{/* Add User Modal */}
@@ -367,28 +462,28 @@ export default function UserManagementPage() {
 									<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Username <span className="text-red-500">*</span></label>
 									<input type="text" value={form.username} onChange={(e) => handleChange("username", e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm" placeholder="e.g. ramesh.kumar" />
 								</div>
-								
+
 								<div>
 									<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Access Role <span className="text-red-500">*</span></label>
 									<select value={form.role} onChange={(e) => handleChange("role", e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm">
 										{ROLES.map(r => (
-											<option 
-												key={r} 
-												value={r} 
-												disabled={r === "SUPER_ADMIN" && hasSuperAdmin && editingUser?.role !== "SUPER_ADMIN"}
+											<option
+												key={r}
+												value={r}
+												disabled={r === "Admin" && hasSuperAdmin && editingUser?.role !== "Admin"}
 											>
-												{r} {r === "SUPER_ADMIN" && hasSuperAdmin && editingUser?.role !== "SUPER_ADMIN" ? "(Only one allowed)" : ""}
+												{r} {r === "Admin" && hasSuperAdmin && editingUser?.role !== "Admin" ? "(Only one allowed)" : ""}
 											</option>
 										))}
 									</select>
 								</div>
 								<div>
-									<label className={`block text-sm font-semibold ${form.role === "SUPER_ADMIN" ? "text-slate-400" : "text-slate-700"} mb-1.5 ml-1`}>
-										Department {form.role !== "SUPER_ADMIN" && <span className="text-red-500">*</span>}
+									<label className={`block text-sm font-semibold ${["Admin", "CEO"].includes(form.role) ? "text-slate-400" : "text-slate-700"} mb-1.5 ml-1`}>
+										Department {!["Admin", "CEO"].includes(form.role) && <span className="text-red-500">*</span>}
 									</label>
 									<select
 										value={form.departmentId}
-										disabled={form.role === "SUPER_ADMIN"}
+										disabled={["Admin", "CEO"].includes(form.role)}
 										onChange={(e) => handleChange("departmentId", e.target.value)}
 										className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm disabled:opacity-50"
 									>

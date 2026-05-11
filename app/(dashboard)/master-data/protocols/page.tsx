@@ -40,6 +40,21 @@ export default function ProtocolManagement() {
 	const [success, setSuccess] = useState("");
 	const [expandedId, setExpandedId] = useState<number | null>(null);
 	const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
+	const [testTypeFilter, setTestTypeFilter] = useState("");
+	const [testCategoryFilter, setTestCategoryFilter] = useState("");
+
+	const filteredProtocols = useMemo(() => {
+		return protocols.filter(p => {
+			const matchesType = !testTypeFilter || p.testTypeId?.toString() === testTypeFilter;
+			const matchesCategory = !testCategoryFilter || p.testCategoryId?.toString() === testCategoryFilter;
+			return matchesType && matchesCategory;
+		});
+	}, [protocols, testTypeFilter, testCategoryFilter]);
+
+	const categoriesForFilter = useMemo(() => {
+		if (!testTypeFilter) return [];
+		return allCategories.filter(c => c.testTypeId === parseInt(testTypeFilter));
+	}, [allCategories, testTypeFilter]);
 
 	const fetchData = useCallback(async () => {
 		setLoading(true);
@@ -177,6 +192,50 @@ export default function ProtocolManagement() {
 				</button>
 			</div>
 
+			{/* Filters */}
+			<div className="mb-8 flex flex-wrap items-center gap-4 bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+				<div className="flex items-center gap-2">
+					<svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+					</svg>
+					<span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Filter By:</span>
+				</div>
+
+				<select
+					value={testTypeFilter}
+					onChange={(e) => { setTestTypeFilter(e.target.value); setTestCategoryFilter(""); }}
+					className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest outline-none focus:ring-4 focus:ring-blue-500/10 transition-all"
+				>
+					<option value="">All Test Types</option>
+					{testTypes.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+				</select>
+
+				<select
+					value={testCategoryFilter}
+					onChange={(e) => setTestCategoryFilter(e.target.value)}
+					disabled={!testTypeFilter}
+					className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest outline-none focus:ring-4 focus:ring-blue-500/10 transition-all disabled:opacity-30"
+				>
+					<option value="">All Categories</option>
+					{categoriesForFilter.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+				</select>
+
+				{(testTypeFilter || testCategoryFilter) && (
+					<button
+						onClick={() => { setTestTypeFilter(""); setTestCategoryFilter(""); }}
+						className="text-[10px] font-black text-rose-500 uppercase tracking-widest hover:underline"
+					>
+						Clear Filters
+					</button>
+				)}
+
+				<div className="ml-auto">
+					<span className="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-100 px-3 py-1 rounded-lg">
+						{filteredProtocols.length} Protocols
+					</span>
+				</div>
+			</div>
+
 			{success && (
 				<div className="mb-6 bg-emerald-50 text-emerald-700 px-4 py-3 rounded-xl text-sm border border-emerald-100 flex items-center gap-2 font-medium animate-in fade-in">
 					<svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -193,13 +252,13 @@ export default function ProtocolManagement() {
 						<div key={i} className="bg-white rounded-3xl border border-slate-100 h-48 animate-pulse" />
 					))}
 				</div>
-			) : protocols.length === 0 ? (
+			) : filteredProtocols.length === 0 ? (
 				<div className="bg-white rounded-3xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-16 text-center">
-					<p className="font-bold text-slate-500">No protocols yet</p>
+					<p className="font-bold text-slate-500 uppercase tracking-widest text-xs">No protocols match your filters</p>
 				</div>
 			) : (
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-					{protocols.map((p, idx) => (
+					{filteredProtocols.map((p, idx) => (
 						<div
 							key={p.id}
 							className="bg-white p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 hover:border-blue-200 hover:shadow-lg transition-all group relative overflow-hidden"
@@ -286,16 +345,16 @@ export default function ProtocolManagement() {
 						</div>
 						<form onSubmit={handleSave} className="p-8 space-y-5">
 							{error && <div className="bg-red-50 text-red-600 px-4 py-3 rounded-xl text-sm border border-red-100 font-medium">{error}</div>}
-							
+
 							<div>
 								<label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">Protocol Name <span className="text-red-500">*</span></label>
-								<input 
-									type="text" 
-									value={form.name} 
-									onChange={(e) => set("name", e.target.value)} 
-									autoFocus 
-									className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm font-bold" 
-									placeholder="e.g. Wash Motor Endurance Test" 
+								<input
+									type="text"
+									value={form.name}
+									onChange={(e) => set("name", e.target.value)}
+									autoFocus
+									className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm font-bold"
+									placeholder="e.g. Wash Motor Endurance Test"
 								/>
 							</div>
 
@@ -339,11 +398,10 @@ export default function ProtocolManagement() {
 												key={type}
 												type="button"
 												onClick={() => toggleType(type)}
-												className={`py-3 rounded-2xl text-[10px] font-black transition-all border-2 ${
-													isSelected
-														? "bg-slate-900 border-slate-900 text-white shadow-xl shadow-slate-900/20"
-														: "bg-white border-slate-100 text-slate-400 hover:border-slate-300"
-												}`}
+												className={`py-3 rounded-2xl text-[10px] font-black transition-all border-2 ${isSelected
+													? "bg-slate-900 border-slate-900 text-white shadow-xl shadow-slate-900/20"
+													: "bg-white border-slate-100 text-slate-400 hover:border-slate-300"
+													}`}
 											>
 												{type}
 											</button>

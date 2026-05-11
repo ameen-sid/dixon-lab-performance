@@ -21,6 +21,15 @@ export async function POST(req: Request) {
 			},
 		});
 
+		// Update station status if stations were selected
+		if (body.stationIds) {
+			const sids = body.stationIds.split(",");
+			await prisma.station.updateMany({
+				where: { id: { in: sids } },
+				data: { status: "OCCUPIED" }
+			});
+		}
+
 		return NextResponse.json(newPlan, { status: 201 });
 	} catch (error: any) {
 		console.error("Error creating test plan:", error);
@@ -30,6 +39,17 @@ export async function POST(req: Request) {
 
 export async function GET() {
 	try {
+		const now = new Date();
+		
+		// Auto-start planned tests that reached start date
+		await prisma.testPlan.updateMany({
+			where: {
+				status: "PLANNED",
+				startDate: { lte: now }
+			},
+			data: { status: "ONGOING" }
+		});
+
 		const plans = await prisma.testPlan.findMany({
 			include: {
 				testType: true,

@@ -77,6 +77,8 @@ model InspectionResult {
   inspectedById Int
   inspectedBy   String // Name of the engineer
 
+  testPlans TestPlan[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -124,6 +126,9 @@ model TestPlan {
   testProtocolId Int
   testProtocol   TestProtocol @relation(fields: [testProtocolId], references: [id], onUpdate: NoAction, onDelete: NoAction)
 
+  inspectionResultId Int?
+  inspectionResult   InspectionResult? @relation(fields: [inspectionResultId], references: [id])
+
   referenceStd   String?
   numDays        Int
   startDate      DateTime
@@ -131,12 +136,32 @@ model TestPlan {
   remarks        String?  @db.NVarChar(Max)
   stationIds     String?  // Comma separated station IDs
   
-  status         String   @default("PLANNED") // PLANNED, ONGOING, COMPLETED
+  status         String   @default("PLANNED") // PLANNED, ONGOING, COMPLETED, PENDING_APPROVAL, APPROVED, FAILED
   
   dailyLogs      DailyChecksheet[]
+  capaReports    CapaReport[]
 
+  managerReviewed Boolean  @default(false)
+  retestFlag      Boolean  @default(false)
+  retestCount     Int      @default(0)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+}
+
+model CapaReport {
+  id          Int      @id @default(autoincrement())
+  testPlanId  Int
+  testPlan    TestPlan @relation(fields: [testPlanId], references: [id])
+  
+  problem     String   @db.NVarChar(Max)
+  rootCause   String   @db.NVarChar(Max)
+  actionTaken String   @db.NVarChar(Max)
+  status      String   @default("Submitted") // Submitted, Reviewed, Closed
+  
+  submittedById Int
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model DailyChecksheet {

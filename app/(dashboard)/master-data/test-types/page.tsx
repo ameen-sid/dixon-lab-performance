@@ -37,7 +37,7 @@ export default function TestTypeManagement() {
 	}, [fetchTypes]);
 
 	const filteredTypes = useMemo(() => {
-		return types.filter(t => 
+		return types.filter(t =>
 			t.name.toLowerCase().includes(searchQuery.toLowerCase())
 		);
 	}, [types, searchQuery]);
@@ -67,7 +67,7 @@ export default function TestTypeManagement() {
 			const res = await fetch(url, {
 				method,
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ 
+				body: JSON.stringify({
 					name: nameInput.trim()
 				}),
 			});

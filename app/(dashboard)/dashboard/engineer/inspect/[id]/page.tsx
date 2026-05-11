@@ -13,7 +13,8 @@ export default async function InspectionPage({ params }: { params: Promise<{ id:
 	const { id } = await params;
 	const requestId = parseInt(id);
 
-	if (!user || user.role !== "Engineer") {
+	const allowedRoles = ["Engineer", "Lab Manager", "Head", "Admin"];
+	if (!user || !allowedRoles.includes(user.role)) {
 		redirect("/login");
 	}
 
@@ -85,7 +86,12 @@ export default async function InspectionPage({ params }: { params: Promise<{ id:
 		});
 
 		revalidatePath(`/dashboard/engineer/inspect/${requestId}`);
-		redirect("/dashboard/engineer/samples");
+		
+		if (user!.role === "Lab Manager") {
+			redirect("/dashboard/manager/assigned-samples");
+		} else {
+			redirect("/dashboard/engineer/samples");
+		}
 	}
 
 	return (
