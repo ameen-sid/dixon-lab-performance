@@ -11,7 +11,7 @@ export async function getCurrentUser() {
 		const decoded = jwt.verify(
 			token,
 			process.env.JWT_SECRET || "fallback_secret_do_not_use_in_prod"
-		) as { userId: number; username: string; role: string };
+		) as { userId: number; username: string; name: string; role: string };
 		return decoded;
 	} catch (error) {
 		return null;

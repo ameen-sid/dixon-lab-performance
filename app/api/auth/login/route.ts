@@ -45,6 +45,7 @@ export async function POST(req: Request) {
 			{
 				userId: user.id,
 				username: user.username,
+				name: user.name,
 				role: user.role,
 			},
 			secret,
