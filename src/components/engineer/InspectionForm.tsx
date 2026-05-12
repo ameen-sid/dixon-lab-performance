@@ -57,7 +57,7 @@ export default function InspectionForm({ request, user, onSubmit }: Props) {
 				<div>
 					<Link
 						href={user.role === "Lab Manager" ? "/dashboard/manager/requests" : "/dashboard/engineer/samples"}
-						className="text-sm font-semibold text-slate-500 hover:text-blue-600 flex items-center gap-1 mb-4 transition-colors"
+						className="text-sm font-semibold text-slate-500 hover:text-blue-600 flex items-center gap-1 mb-4 transition-colors cursor-pointer"
 					>
 						<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -200,7 +200,7 @@ export default function InspectionForm({ request, user, onSubmit }: Props) {
 							<button
 								type="submit"
 								disabled={loading}
-								className="bg-slate-900 text-white px-12 py-4 rounded-2xl font-bold text-lg hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/20 transform active:scale-95 disabled:bg-slate-400"
+								className="bg-slate-900 text-white px-12 py-4 rounded-2xl font-bold text-lg hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/20 transform active:scale-95 disabled:bg-slate-400 cursor-pointer"
 							>
 								{loading ? "Submitting..." : "Submit Inspection Report"}
 							</button>

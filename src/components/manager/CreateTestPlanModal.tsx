@@ -121,7 +121,7 @@ export default function CreateTestPlanModal({ isOpen, onClose, inspectionId, req
 			<div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
 				<div className="bg-slate-900 px-8 py-5 flex justify-between items-center sticky top-0 z-10">
 					<h3 className="text-white font-bold uppercase tracking-tight">Schedule New Test Plan</h3>
-					<button onClick={onClose} className="text-slate-400 hover:text-white">
+					<button onClick={onClose} className="text-slate-400 hover:text-white cursor-pointer">
 						<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
 						</svg>
@@ -158,7 +158,7 @@ export default function CreateTestPlanModal({ isOpen, onClose, inspectionId, req
 							<select
 								value={formData.testTypeId}
 								onChange={(e) => setFormData({ ...formData, testTypeId: e.target.value, testCategoryId: "", testProtocolId: "" })}
-								className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none text-sm font-bold"
+								className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none text-sm font-bold cursor-pointer"
 							>
 								<option value="">Select Type...</option>
 								{metadata?.testTypes?.map((t: any) => <option key={t.id} value={t.id}>{t.name}</option>)}
@@ -170,7 +170,7 @@ export default function CreateTestPlanModal({ isOpen, onClose, inspectionId, req
 								value={formData.testCategoryId}
 								onChange={(e) => setFormData({ ...formData, testCategoryId: e.target.value, testProtocolId: "" })}
 								disabled={!formData.testTypeId}
-								className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none text-sm font-bold disabled:opacity-50"
+								className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none text-sm font-bold disabled:opacity-50 cursor-pointer"
 							>
 								<option value="">Select Category...</option>
 								{filteredCategories.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -188,7 +188,7 @@ export default function CreateTestPlanModal({ isOpen, onClose, inspectionId, req
 											key={pt}
 											type="button"
 											onClick={() => setFormData({ ...formData, productType: pt, testProtocolId: "" })}
-											className={`py-3 rounded-2xl text-[10px] font-black border-2 transition-all ${formData.productType === pt
+											className={`py-3 rounded-2xl text-[10px] font-black border-2 transition-all cursor-pointer ${formData.productType === pt
 												? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-200"
 												: "bg-white border-slate-100 text-slate-400 hover:border-slate-200"
 												}`}
@@ -222,10 +222,10 @@ export default function CreateTestPlanModal({ isOpen, onClose, inspectionId, req
 																setFormData({ ...formData, stationIds: newIds });
 															}}
 															className={`py-2 rounded-xl text-[10px] font-bold border transition-all relative group/stn ${isSelected
-																? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-200"
+																? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-200 cursor-pointer"
 																: isOccupied
 																	? "bg-rose-50 border-rose-100 text-rose-300 cursor-not-allowed"
-																	: "bg-white border-slate-200 text-slate-600 hover:border-blue-300 hover:text-blue-600"
+																	: "bg-white border-slate-200 text-slate-600 hover:border-blue-300 hover:text-blue-600 cursor-pointer"
 																}`}
 														>
 															{s.id.split("-S")[1]}
@@ -249,7 +249,7 @@ export default function CreateTestPlanModal({ isOpen, onClose, inspectionId, req
 							value={formData.testProtocolId}
 							onChange={(e) => setFormData({ ...formData, testProtocolId: e.target.value })}
 							disabled={!formData.testCategoryId}
-							className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none text-sm font-bold disabled:opacity-50"
+							className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none text-sm font-bold disabled:opacity-50 cursor-pointer"
 						>
 							<option value="">Select Protocol...</option>
 							{filteredProtocols.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
@@ -285,7 +285,7 @@ export default function CreateTestPlanModal({ isOpen, onClose, inspectionId, req
 								type="date"
 								value={formData.startDate}
 								onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-								className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none text-sm font-bold"
+								className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none text-sm font-bold cursor-pointer"
 							/>
 						</div>
 						<div>
@@ -311,8 +311,8 @@ export default function CreateTestPlanModal({ isOpen, onClose, inspectionId, req
 					</div>
 
 					<div className="flex gap-3 pt-2">
-						<button type="button" onClick={onClose} className="flex-1 px-6 py-3 rounded-2xl font-bold text-slate-400 hover:bg-slate-50 transition-all text-sm">Cancel</button>
-						<button type="submit" disabled={loading} className="flex-[2] bg-slate-900 text-white font-bold py-3 rounded-2xl shadow-2xl shadow-slate-900/30 transition-all text-sm hover:bg-slate-800 disabled:bg-slate-400">
+						<button type="button" onClick={onClose} className="flex-1 px-6 py-3 rounded-2xl font-bold text-slate-400 hover:bg-slate-50 transition-all text-sm cursor-pointer">Cancel</button>
+						<button type="submit" disabled={loading} className="flex-[2] bg-slate-900 text-white font-bold py-3 rounded-2xl shadow-2xl shadow-slate-900/30 transition-all text-sm hover:bg-slate-800 disabled:bg-slate-400 cursor-pointer">
 							{loading ? "Saving..." : "Confirm Schedule"}
 						</button>
 					</div>

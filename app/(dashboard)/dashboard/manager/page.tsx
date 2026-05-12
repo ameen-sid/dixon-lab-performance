@@ -159,6 +159,7 @@ export default async function ManagerDashboard() {
 					reportData={reportData} 
 					capaSubmitterData={capaSubmitterData} 
 					trendData={[]} 
+					showCapa={false}
 				/>
 			</div>
 		</div>

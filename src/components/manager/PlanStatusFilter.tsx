@@ -33,7 +33,7 @@ export default function PlanStatusFilter() {
 				<button
 					key={f.value}
 					onClick={() => handleFilterChange(f.value)}
-					className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${currentFilter === f.value
+					className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all cursor-pointer ${currentFilter === f.value
 							? "bg-white text-slate-900 shadow-lg scale-100"
 							: "text-slate-400 hover:text-slate-600 hover:bg-slate-50 scale-95"
 						}`}

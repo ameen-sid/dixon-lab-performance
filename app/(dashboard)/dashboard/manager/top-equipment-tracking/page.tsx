@@ -90,21 +90,21 @@ export default function TopEquipmentTracking() {
 									<button
 										disabled={updating === item.id || item.status === "AVAILABLE"}
 										onClick={() => updateStatus(item.id, item.name, "AVAILABLE")}
-										className="flex-1 py-2 rounded-xl text-[10px] font-black border transition-all hover:bg-emerald-50 hover:border-emerald-100 hover:text-emerald-600 disabled:opacity-30"
+										className="flex-1 py-2 rounded-xl text-[10px] font-black border transition-all hover:bg-emerald-50 hover:border-emerald-100 hover:text-emerald-600 disabled:opacity-30 cursor-pointer"
 									>
 										MAKE FREE
 									</button>
 									<button
 										disabled={updating === item.id || item.status === "OCCUPIED"}
 										onClick={() => updateStatus(item.id, item.name, "OCCUPIED")}
-										className="flex-1 py-2 rounded-xl text-[10px] font-black border transition-all hover:bg-blue-50 hover:border-blue-100 hover:text-blue-600 disabled:opacity-30"
+										className="flex-1 py-2 rounded-xl text-[10px] font-black border transition-all hover:bg-blue-50 hover:border-blue-100 hover:text-blue-600 disabled:opacity-30 cursor-pointer"
 									>
 										MARK IN-USE
 									</button>
 									<button
 										disabled={updating === item.id || item.status === "MAINTENANCE"}
 										onClick={() => updateStatus(item.id, item.name, "MAINTENANCE")}
-										className="flex-1 py-2 rounded-xl text-[10px] font-black border transition-all hover:bg-amber-50 hover:border-amber-100 hover:text-amber-600 disabled:opacity-30"
+										className="flex-1 py-2 rounded-xl text-[10px] font-black border transition-all hover:bg-amber-50 hover:border-amber-100 hover:text-amber-600 disabled:opacity-30 cursor-pointer"
 									>
 										REPAIR
 									</button>

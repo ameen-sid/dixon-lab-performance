@@ -21,6 +21,7 @@ interface ChartProps {
   reportData: any[];
   capaSubmitterData: any[];
   trendData: any[]; // Kept for the line chart as it was in the first picture
+  showCapa?: boolean;
 }
 
 export default function HeadDashboardCharts({
@@ -28,6 +29,7 @@ export default function HeadDashboardCharts({
   reportData = [],
   capaSubmitterData = [],
   trendData = [],
+  showCapa = true,
 }: ChartProps) {
   // Colors for requests
   const requestColors: Record<string, string> = {
@@ -101,7 +103,8 @@ export default function HeadDashboardCharts({
       </div>
 
       {/* 3. CAPA Reports by Submitter */}
-      <div className="dixon-card p-6 bg-white border-slate-200 shadow-xl flex flex-col min-h-[400px] lg:col-span-2">
+      {showCapa && (
+        <div className="dixon-card p-6 bg-white border-slate-200 shadow-xl flex flex-col min-h-[400px] lg:col-span-2">
         <h3 className="text-xl font-black text-slate-900 uppercase tracking-widest mb-6">
           CAPA Reports by Submitter
         </h3>
@@ -117,6 +120,7 @@ export default function HeadDashboardCharts({
           </ResponsiveContainer>
         </div>
       </div>
+      )}
     </div>
   );
 }

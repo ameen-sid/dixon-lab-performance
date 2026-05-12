@@ -29,6 +29,7 @@ export default function ReliabilityPlatformAvailability() {
 	const [selectedStation, setSelectedStation] = useState<Station | null>(null);
 
 	const fetchStations = useCallback(async () => {
+		setLoading(true);
 		try {
 			const res = await fetch("/api/stations");
 			if (res.ok) setStations(await res.json());
@@ -86,7 +87,7 @@ export default function ReliabilityPlatformAvailability() {
 						</div>
 					</div>
 				</div>
-				<button onClick={fetchStations} className="p-2 text-slate-400 hover:text-blue-600 transition-colors">
+				<button onClick={fetchStations} className="p-2 text-slate-400 hover:text-blue-600 transition-colors cursor-pointer">
 					<svg className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
 					</svg>
@@ -112,7 +113,7 @@ export default function ReliabilityPlatformAvailability() {
 										key={station.id}
 										onClick={() => setSelectedStation(station)}
 										className={`
-											relative aspect-auto p-2 rounded-lg border flex flex-col items-center justify-center transition-all group/station transform active:scale-90
+											relative aspect-auto p-2 rounded-lg border flex flex-col items-center justify-center transition-all group/station transform active:scale-90 cursor-pointer
 											${station.status === "OCCUPIED"
 												? "bg-rose-50 border-rose-100"
 												: "bg-emerald-50 border-emerald-100 hover:bg-emerald-100"}
@@ -146,7 +147,7 @@ export default function ReliabilityPlatformAvailability() {
 								<p className="text-[10px] font-black text-white/70 uppercase tracking-[0.2em]">Station Context</p>
 								<h3 className="text-2xl font-black text-white leading-none mt-1">{selectedStation.id}</h3>
 							</div>
-							<button onClick={() => setSelectedStation(null)} className="bg-white/20 hover:bg-white/30 text-white p-2 rounded-xl transition-all">
+							<button onClick={() => setSelectedStation(null)} className="bg-white/20 hover:bg-white/30 text-white p-2 rounded-xl transition-all cursor-pointer">
 								<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
 								</svg>
@@ -211,7 +212,7 @@ export default function ReliabilityPlatformAvailability() {
 
 							<button
 								onClick={() => setSelectedStation(null)}
-								className="w-full mt-8 py-4 bg-slate-900 text-white rounded-2xl font-black text-sm uppercase tracking-[0.2em] shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all active:scale-95"
+								className="w-full mt-8 py-4 bg-slate-900 text-white rounded-2xl font-black text-sm uppercase tracking-[0.2em] shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all active:scale-95 cursor-pointer"
 							>
 								Close View
 							</button>

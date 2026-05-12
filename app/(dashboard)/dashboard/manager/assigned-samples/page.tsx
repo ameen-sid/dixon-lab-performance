@@ -124,14 +124,14 @@ export default async function ManagerAssignedSamplesPage(props: { searchParams: 
 											{sample.inspection ? (
 												<Link
 													href={`/dashboard/engineer/inspect/${sample.id}`}
-													className="text-xs font-bold text-slate-400 hover:text-slate-600 underline decoration-slate-200"
+													className="text-xs font-bold text-slate-400 hover:text-slate-600 underline decoration-slate-200 cursor-pointer"
 												>
 													View Report
 												</Link>
 											) : (
 												<Link
 													href={`/dashboard/engineer/inspect/${sample.id}`}
-													className="px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10 active:scale-95"
+													className="px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10 active:scale-95 cursor-pointer"
 												>
 													Inspect Now
 												</Link>

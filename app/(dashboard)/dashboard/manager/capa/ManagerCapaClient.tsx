@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
+import Link from "next/link";
 
 type CapaReport = {
 	id: number;
@@ -101,7 +102,7 @@ export default function ManagerCapaClient() {
 				</div>
 				<button
 					onClick={() => setShowModal(true)}
-					className="bg-slate-900 text-white px-8 py-3 rounded-2xl font-black text-sm shadow-xl shadow-slate-900/20 transition-all hover:bg-slate-800 active:scale-95 flex items-center gap-2"
+					className="bg-slate-900 text-white px-8 py-3 rounded-2xl font-black text-sm shadow-xl shadow-slate-900/20 transition-all hover:bg-slate-800 active:scale-95 flex items-center gap-2 cursor-pointer"
 				>
 					<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
@@ -131,7 +132,7 @@ export default function ManagerCapaClient() {
 			) : (
 				<div className="grid grid-cols-1 gap-6">
 					{reports.map((r) => (
-						<div key={r.id} className="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+						<Link key={r.id} href={`/dashboard/manager/capa/${r.id}`} className="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm hover:shadow-md transition-shadow block">
 							<div className="flex justify-between items-start mb-6">
 								<div>
 									<div className="flex items-center gap-3 mb-2">
@@ -150,18 +151,18 @@ export default function ManagerCapaClient() {
 							<div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 								<div className="space-y-2">
 									<p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Observed Problem</p>
-									<p className="text-sm font-medium text-slate-700 leading-relaxed">{r.problem}</p>
+									<p className="text-sm font-medium text-slate-700 leading-relaxed line-clamp-2">{r.problem}</p>
 								</div>
 								<div className="space-y-2">
 									<p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Root Cause</p>
-									<p className="text-sm font-medium text-slate-700 leading-relaxed">{r.rootCause}</p>
+									<p className="text-sm font-medium text-slate-700 leading-relaxed line-clamp-2">{r.rootCause}</p>
 								</div>
 								<div className="space-y-2">
 									<p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Action Taken</p>
-									<p className="text-sm font-medium text-slate-700 leading-relaxed">{r.actionTaken}</p>
+									<p className="text-sm font-medium text-slate-700 leading-relaxed line-clamp-2">{r.actionTaken}</p>
 								</div>
 							</div>
-						</div>
+						</Link>
 					))}
 				</div>
 			)}
@@ -172,7 +173,7 @@ export default function ManagerCapaClient() {
 					<div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-10 animate-in zoom-in-95 duration-200 no-scrollbar">
 						<div className="flex justify-between items-center mb-8">
 							<h3 className="text-2xl font-black text-slate-900 tracking-tight">Manager RCA Submission</h3>
-							<button onClick={() => setShowModal(false)} className="p-2 hover:bg-slate-50 rounded-full transition-colors text-slate-400">
+							<button onClick={() => setShowModal(false)} className="p-2 hover:bg-slate-50 rounded-full transition-colors text-slate-400 cursor-pointer">
 								<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
 							</button>
 						</div>
@@ -185,7 +186,7 @@ export default function ManagerCapaClient() {
 								<select
 									value={form.testPlanId}
 									onChange={(e) => setForm(f => ({ ...f, testPlanId: e.target.value }))}
-									className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
+									className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-blue-500/10 outline-none transition-all cursor-pointer"
 								>
 									<option value="">Select a failed/rejected plan...</option>
 									{eligiblePlans.map(p => (
@@ -235,14 +236,14 @@ export default function ManagerCapaClient() {
 								<button
 									type="button"
 									onClick={() => setShowModal(false)}
-									className="flex-1 px-8 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest text-slate-400 hover:bg-slate-50 transition-all"
+									className="flex-1 px-8 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest text-slate-400 hover:bg-slate-50 transition-all cursor-pointer"
 								>
 									Discard
 								</button>
 								<button
 									type="submit"
 									disabled={saving}
-									className="flex-[2] px-8 py-4 bg-slate-900 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all active:scale-95 disabled:opacity-50"
+									className="flex-[2] px-8 py-4 bg-slate-900 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
 								>
 									{saving ? "Submitting..." : "Submit RCA Report"}
 								</button>

@@ -318,7 +318,7 @@ export default function PlansClient({ initialPlans, totalItems, currentPage, ite
 													{showEvaluate && (
 														<button
 															onClick={() => handleEvaluate(p.id)}
-															className="bg-blue-600 text-white text-[10px] font-black px-4 py-1.5 rounded-lg shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-all uppercase"
+															className="bg-blue-600 text-white text-[10px] font-black px-4 py-1.5 rounded-lg shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-all uppercase cursor-pointer"
 														>
 															Evaluate Result
 														</button>
@@ -327,7 +327,7 @@ export default function PlansClient({ initialPlans, totalItems, currentPage, ite
 														<a
 															href={`/api/reports/test-plan/${p.id}`}
 															target="_blank"
-															className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-white rounded-lg border border-transparent hover:border-blue-100 transition-all group/pdf"
+															className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-white rounded-lg border border-transparent hover:border-blue-100 transition-all group/pdf cursor-pointer"
 															title="Download Report"
 														>
 															<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -338,7 +338,7 @@ export default function PlansClient({ initialPlans, totalItems, currentPage, ite
 													{(["PENDING_REVIEW", "PENDING_APPROVAL", "FAILED"].includes(p.status) && !p.managerReviewed && !p.retestFlag) && (
 														<button
 															onClick={() => handleReview(p.id)}
-															className="bg-emerald-600 text-white text-[10px] font-black px-4 py-1.5 rounded-lg shadow-lg shadow-emerald-500/20 hover:bg-emerald-700 transition-all uppercase whitespace-nowrap"
+															className="bg-emerald-600 text-white text-[10px] font-black px-4 py-1.5 rounded-lg shadow-lg shadow-emerald-500/20 hover:bg-emerald-700 transition-all uppercase whitespace-nowrap cursor-pointer"
 														>
 															Review Report
 														</button>
@@ -346,14 +346,14 @@ export default function PlansClient({ initialPlans, totalItems, currentPage, ite
 													{p.retestFlag && (
 														<button
 															onClick={() => openEdit(p)}
-															className="bg-amber-600 text-white text-[10px] font-black px-4 py-1.5 rounded-lg shadow-lg shadow-amber-500/20 hover:bg-amber-700 transition-all uppercase whitespace-nowrap"
+															className="bg-amber-600 text-white text-[10px] font-black px-4 py-1.5 rounded-lg shadow-lg shadow-amber-500/20 hover:bg-amber-700 transition-all uppercase whitespace-nowrap cursor-pointer"
 														>
 															Schedule Retest
 														</button>
 													)}
 													<div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity ml-2">
-														<button onClick={() => openEdit(p)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-white rounded-xl shadow-sm border border-transparent hover:border-blue-100 transition-all">Edit</button>
-														<button onClick={() => setDeleteConfirm(p.id)} className="p-2 text-slate-400 hover:text-rose-600 hover:bg-white rounded-xl shadow-sm border border-transparent hover:border-rose-100 transition-all">Delete</button>
+														<button onClick={() => openEdit(p)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-white rounded-xl shadow-sm border border-transparent hover:border-blue-100 transition-all cursor-pointer">Edit</button>
+														<button onClick={() => setDeleteConfirm(p.id)} className="p-2 text-slate-400 hover:text-rose-600 hover:bg-white rounded-xl shadow-sm border border-transparent hover:border-rose-100 transition-all cursor-pointer">Delete</button>
 													</div>
 												</div>
 											</td>
@@ -377,7 +377,7 @@ export default function PlansClient({ initialPlans, totalItems, currentPage, ite
 					<div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
 						<div className="bg-slate-900 px-8 py-5 flex justify-between items-center sticky top-0 z-10">
 							<h3 className="text-white font-bold">{editTarget ? "Edit Test Plan" : "Schedule New Test Plan"}</h3>
-							<button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-white">
+							<button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-white cursor-pointer">
 								<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
 								</svg>
@@ -392,7 +392,7 @@ export default function PlansClient({ initialPlans, totalItems, currentPage, ite
 									<select
 										value={form.testTypeId}
 										onChange={(e) => setForm(f => ({ ...f, testTypeId: e.target.value, testCategoryId: "", testProtocolId: "" }))}
-										className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none text-sm font-bold"
+										className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none text-sm font-bold cursor-pointer"
 									>
 										<option value="">Select Type...</option>
 										{master.types.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
@@ -404,7 +404,7 @@ export default function PlansClient({ initialPlans, totalItems, currentPage, ite
 										value={form.testCategoryId}
 										onChange={(e) => setForm(f => ({ ...f, testCategoryId: e.target.value, testProtocolId: "" }))}
 										disabled={!form.testTypeId}
-										className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none text-sm font-bold disabled:opacity-50"
+										className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none text-sm font-bold disabled:opacity-50 cursor-pointer"
 									>
 										<option value="">Select Category...</option>
 										{filteredCategories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -423,8 +423,8 @@ export default function PlansClient({ initialPlans, totalItems, currentPage, ite
 													type="button"
 													onClick={() => setForm(f => ({ ...f, productType: pt, testProtocolId: "" }))}
 													className={`py-3 rounded-2xl text-[10px] font-black border-2 transition-all ${form.productType === pt
-														? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-200"
-														: "bg-white border-slate-100 text-slate-400 hover:border-slate-200"
+														? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-200 cursor-pointer"
+														: "bg-white border-slate-100 text-slate-400 hover:border-slate-200 cursor-pointer"
 														}`}
 												>
 													{pt}
@@ -456,10 +456,10 @@ export default function PlansClient({ initialPlans, totalItems, currentPage, ite
 																		setForm(f => ({ ...f, stationIds: newIds }));
 																	}}
 																	className={`py-2 rounded-xl text-[10px] font-bold border transition-all relative group/stn ${isSelected
-																		? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-200"
+																		? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-200 cursor-pointer"
 																		: isOccupied
 																			? "bg-rose-50 border-rose-100 text-rose-300 cursor-not-allowed"
-																			: "bg-white border-slate-200 text-slate-600 hover:border-blue-300 hover:text-blue-600"
+																			: "bg-white border-slate-200 text-slate-600 hover:border-blue-300 hover:text-blue-600 cursor-pointer"
 																		}`}
 																>
 																	{s.id.split("-S")[1]}
@@ -483,7 +483,7 @@ export default function PlansClient({ initialPlans, totalItems, currentPage, ite
 									value={form.testProtocolId}
 									onChange={(e) => setForm(f => ({ ...f, testProtocolId: e.target.value }))}
 									disabled={!form.testCategoryId}
-									className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none text-sm font-bold disabled:opacity-50"
+									className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none text-sm font-bold disabled:opacity-50 cursor-pointer"
 								>
 									<option value="">Select Protocol...</option>
 									{filteredProtocols.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
@@ -519,7 +519,7 @@ export default function PlansClient({ initialPlans, totalItems, currentPage, ite
 										type="date"
 										value={form.startDate}
 										onChange={(e) => setForm(f => ({ ...f, startDate: e.target.value }))}
-										className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none text-sm font-bold"
+										className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none text-sm font-bold cursor-pointer"
 									/>
 								</div>
 								<div>
@@ -545,8 +545,8 @@ export default function PlansClient({ initialPlans, totalItems, currentPage, ite
 							</div>
 
 							<div className="flex gap-3 pt-2">
-								<button type="button" onClick={() => setShowModal(false)} className="flex-1 px-6 py-3 rounded-2xl font-bold text-slate-400 hover:bg-slate-50 transition-all text-sm">Cancel</button>
-								<button type="submit" disabled={saving} className="flex-[2] bg-slate-900 text-white font-bold py-3 rounded-2xl shadow-2xl shadow-slate-900/30 transition-all text-sm hover:bg-slate-800 disabled:bg-slate-400">
+								<button type="button" onClick={() => setShowModal(false)} className="flex-1 px-6 py-3 rounded-2xl font-bold text-slate-400 hover:bg-slate-50 transition-all text-sm cursor-pointer">Cancel</button>
+								<button type="submit" disabled={saving} className="flex-[2] bg-slate-900 text-white font-bold py-3 rounded-2xl shadow-2xl shadow-slate-900/30 transition-all text-sm hover:bg-slate-800 disabled:bg-slate-400 cursor-pointer">
 									{saving ? "Saving..." : (editTarget ? "Update Plan" : "Confirm Schedule")}
 								</button>
 							</div>
@@ -561,8 +561,8 @@ export default function PlansClient({ initialPlans, totalItems, currentPage, ite
 					<div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-sm p-8 text-center animate-in zoom-in-95 duration-200">
 						<h3 className="text-xl font-bold text-slate-900 mb-6">Cancel this test plan?</h3>
 						<div className="flex gap-3">
-							<button onClick={() => setDeleteConfirm(null)} className="flex-1 px-4 py-3 rounded-2xl font-bold text-slate-400 hover:bg-slate-50 text-sm">No, Keep it</button>
-							<button onClick={() => handleDelete(deleteConfirm)} className="flex-1 bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 rounded-2xl text-sm shadow-lg shadow-rose-500/20">Yes, Cancel</button>
+							<button onClick={() => setDeleteConfirm(null)} className="flex-1 px-4 py-3 rounded-2xl font-bold text-slate-400 hover:bg-slate-50 text-sm cursor-pointer">No, Keep it</button>
+							<button onClick={() => handleDelete(deleteConfirm)} className="flex-1 bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 rounded-2xl text-sm shadow-lg shadow-rose-500/20 cursor-pointer">Yes, Cancel</button>
 						</div>
 					</div>
 				</div>

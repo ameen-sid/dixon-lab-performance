@@ -26,7 +26,7 @@ export default function EngineerStatusFilter() {
 				<button
 					key={status}
 					onClick={() => handleStatusChange(status)}
-					className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${currentStatus === status
+					className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${currentStatus === status
 							? "bg-slate-900 text-white shadow-sm"
 							: "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
 						}`}
