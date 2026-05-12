@@ -191,7 +191,7 @@ export default async function NewRequestPage() {
 					<div className="pt-4">
 						<button
 							type="submit"
-							className="w-full bg-slate-900 hover:bg-slate-800 text-white py-4 rounded-2xl font-bold text-lg shadow-xl shadow-slate-900/20 transition-all transform active:scale-[0.98]"
+							className="w-full bg-slate-900 hover:bg-slate-800 text-white py-4 rounded-2xl font-bold text-lg shadow-xl shadow-slate-900/20 transition-all transform active:scale-[0.98] cursor-pointer"
 						>
 							Submit Request
 						</button>

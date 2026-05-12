@@ -102,7 +102,7 @@ export default function CapaClient() {
 				</div>
 				<button
 					onClick={() => setShowModal(true)}
-					className="bg-slate-900 text-white px-8 py-3 rounded-2xl font-black text-sm shadow-xl shadow-slate-900/20 transition-all hover:bg-slate-800 active:scale-95 flex items-center gap-2"
+					className="bg-slate-900 text-white px-8 py-3 rounded-2xl font-black text-sm shadow-xl shadow-slate-900/20 transition-all hover:bg-slate-800 active:scale-95 flex items-center gap-2 cursor-pointer"
 				>
 					<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
@@ -181,7 +181,7 @@ export default function CapaClient() {
 					<div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-10 animate-in zoom-in-95 duration-200 no-scrollbar">
 						<div className="flex justify-between items-center mb-8">
 							<h3 className="text-2xl font-black text-slate-900 tracking-tight">New Root Cause Analysis</h3>
-							<button onClick={() => setShowModal(false)} className="p-2 hover:bg-slate-50 rounded-full transition-colors text-slate-400">
+							<button onClick={() => setShowModal(false)} className="p-2 hover:bg-slate-50 rounded-full transition-colors text-slate-400 cursor-pointer">
 								<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
 							</button>
 						</div>
@@ -194,7 +194,7 @@ export default function CapaClient() {
 								<select
 									value={form.testPlanId}
 									onChange={(e) => setForm(f => ({ ...f, testPlanId: e.target.value }))}
-									className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
+									className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-blue-500/10 outline-none transition-all cursor-pointer"
 								>
 									<option value="">Select a plan...</option>
 									{eligiblePlans.map(p => (
@@ -245,14 +245,14 @@ export default function CapaClient() {
 								<button
 									type="button"
 									onClick={() => setShowModal(false)}
-									className="flex-1 px-8 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest text-slate-400 hover:bg-slate-50 transition-all"
+									className="flex-1 px-8 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest text-slate-400 hover:bg-slate-50 transition-all cursor-pointer"
 								>
 									Discard
 								</button>
 								<button
 									type="submit"
 									disabled={saving}
-									className="flex-[2] px-8 py-4 bg-slate-900 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all active:scale-95 disabled:opacity-50"
+									className="flex-[2] px-8 py-4 bg-slate-900 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
 								>
 									{saving ? "Submitting..." : "Submit RCA Report"}
 								</button>

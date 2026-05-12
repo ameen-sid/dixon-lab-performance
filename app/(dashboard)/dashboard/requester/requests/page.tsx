@@ -95,7 +95,7 @@ export default function MyRequestsPage() {
 						<button
 							key={s}
 							onClick={() => setStatusFilter(s)}
-							className={`px-6 py-2.5 rounded-3xl text-[10px] font-black uppercase tracking-widest transition-all ${statusFilter === s
+							className={`px-6 py-2.5 rounded-3xl text-[10px] font-black uppercase tracking-widest transition-all cursor-pointer ${statusFilter === s
 								? "bg-slate-900 text-white shadow-lg"
 								: "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
 								}`}
@@ -113,7 +113,7 @@ export default function MyRequestsPage() {
 							type="date"
 							value={fromDate}
 							onChange={(e) => setFromDate(e.target.value)}
-							className="bg-transparent text-[10px] font-black text-slate-900 outline-none"
+							className="bg-transparent text-[10px] font-black text-slate-900 outline-none cursor-pointer"
 						/>
 					</div>
 					<div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-2xl">
@@ -122,13 +122,13 @@ export default function MyRequestsPage() {
 							type="date"
 							value={toDate}
 							onChange={(e) => setToDate(e.target.value)}
-							className="bg-transparent text-[10px] font-black text-slate-900 outline-none"
+							className="bg-transparent text-[10px] font-black text-slate-900 outline-none cursor-pointer"
 						/>
 					</div>
 					{(fromDate || toDate) && (
 						<button
 							onClick={() => { setFromDate(""); setToDate(""); }}
-							className="p-2 text-rose-500 hover:bg-rose-50 rounded-full transition-colors"
+							className="p-2 text-rose-500 hover:bg-rose-50 rounded-full transition-colors cursor-pointer"
 							title="Clear Dates"
 						>
 							<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -237,7 +237,7 @@ export default function MyRequestsPage() {
 							<button
 								disabled={currentPage === 1}
 								onClick={() => setCurrentPage(p => p - 1)}
-								className="p-2 rounded-xl border border-slate-200 bg-white text-slate-400 disabled:opacity-30 hover:bg-slate-50 transition-all shadow-sm active:scale-95"
+								className="p-2 rounded-xl border border-slate-200 bg-white text-slate-400 disabled:opacity-30 hover:bg-slate-50 transition-all shadow-sm active:scale-95 cursor-pointer"
 							>
 								<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" /></svg>
 							</button>
@@ -247,7 +247,7 @@ export default function MyRequestsPage() {
 									<button
 										key={page}
 										onClick={() => setCurrentPage(page)}
-										className={`w-9 h-9 rounded-xl text-[10px] font-black transition-all border shadow-sm active:scale-95 ${currentPage === page
+										className={`w-9 h-9 rounded-xl text-[10px] font-black transition-all border shadow-sm active:scale-95 cursor-pointer ${currentPage === page
 												? "bg-slate-900 border-slate-900 text-white shadow-slate-900/20"
 												: "bg-white border-slate-200 text-slate-400 hover:border-slate-300 hover:text-slate-600"
 											}`}
@@ -260,7 +260,7 @@ export default function MyRequestsPage() {
 							<button
 								disabled={currentPage === totalPages}
 								onClick={() => setCurrentPage(p => p + 1)}
-								className="p-2 rounded-xl border border-slate-200 bg-white text-slate-400 disabled:opacity-30 hover:bg-slate-50 transition-all shadow-sm active:scale-95"
+								className="p-2 rounded-xl border border-slate-200 bg-white text-slate-400 disabled:opacity-30 hover:bg-slate-50 transition-all shadow-sm active:scale-95 cursor-pointer"
 							>
 								<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
 							</button>
