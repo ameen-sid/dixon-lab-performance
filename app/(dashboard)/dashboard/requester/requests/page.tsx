@@ -60,7 +60,7 @@ export default function MyRequestsPage() {
 
 	useEffect(() => { setCurrentPage(1); }, [statusFilter, fromDate, toDate]);
 
-	const statuses = ["All", "Pending", "Approved", "Rejected"];
+	const statuses = ["All", "Pending", "Approved", "Rejected", "Completed"];
 
 	if (loading) return (
 		<div className="flex flex-col items-center justify-center min-h-[400px] gap-4">

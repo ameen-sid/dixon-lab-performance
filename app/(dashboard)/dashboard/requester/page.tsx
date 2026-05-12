@@ -22,6 +22,7 @@ export default async function RequesterOverview() {
 		Pending: 0,
 		Approved: 0,
 		Rejected: 0,
+		Completed: 0,
 	};
 
 	requestStats.forEach((stat) => {
@@ -77,7 +78,7 @@ export default async function RequesterOverview() {
 					<h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Request Overviews</h3>
 				</div>
 				
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
 					{/* Total Requests */}
 					<div className="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm relative overflow-hidden group hover:border-slate-300 transition-all">
 						<div className="flex justify-between items-start mb-4 relative z-10">
@@ -131,6 +132,19 @@ export default async function RequesterOverview() {
 							</div>
 							<div className="w-12 h-12 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-500">
 								<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+							</div>
+						</div>
+					</div>
+
+					{/* Completed Requests */}
+					<div className="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm relative overflow-hidden group hover:border-emerald-200 transition-all">
+						<div className="flex justify-between items-start mb-4 relative z-10">
+							<div className="space-y-1">
+								<p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Completed</p>
+								<p className="text-5xl font-black text-slate-900 tracking-tighter">{requestCounts.Completed}</p>
+							</div>
+							<div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-500">
+								<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
 							</div>
 						</div>
 					</div>
