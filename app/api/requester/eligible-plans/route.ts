@@ -15,7 +15,8 @@ export async function GET() {
 					testRequest: {
 						requesterId: user.userId
 					}
-				}
+				},
+				capaReports: { none: {} }
 			},
 			include: {
 				testProtocol: true,

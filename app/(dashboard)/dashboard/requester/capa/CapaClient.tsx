@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
+import Link from "next/link";
 
 type CapaReport = {
 	id: number;
@@ -131,37 +132,45 @@ export default function CapaClient() {
 			) : (
 				<div className="grid grid-cols-1 gap-6">
 					{reports.map((r) => (
-						<div key={r.id} className="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
-							<div className="flex justify-between items-start mb-6">
-								<div>
-									<div className="flex items-center gap-3 mb-2">
-										<span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">{r.testPlan.testCategory.name}</span>
-										<span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 text-[9px] font-black rounded-full uppercase tracking-tighter">
-											{r.status}
-										</span>
+						<Link key={r.id} href={`/dashboard/requester/capa/${r.id}`} className="block group">
+							<div className="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm group-hover:shadow-xl group-hover:border-blue-100 transition-all transform group-hover:-translate-y-1">
+								<div className="flex justify-between items-start mb-6">
+									<div>
+										<div className="flex items-center gap-3 mb-2">
+											<span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">{r.testPlan.testCategory.name}</span>
+											<span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 text-[9px] font-black rounded-full uppercase tracking-tighter">
+												{r.status}
+											</span>
+										</div>
+										<h3 className="text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors">{r.testPlan.testProtocol.name}</h3>
 									</div>
-									<h3 className="text-xl font-bold text-slate-900">{r.testPlan.testProtocol.name}</h3>
+									<div className="flex flex-col items-end gap-1">
+										<span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+											{format(new Date(r.createdAt), "dd MMM yyyy")}
+										</span>
+										<div className="flex items-center gap-1 text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity">
+											<span className="text-[9px] font-bold uppercase tracking-widest">View Full Details</span>
+											<svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" /></svg>
+										</div>
+									</div>
 								</div>
-								<span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-									{format(new Date(r.createdAt), "dd MMM yyyy")}
-								</span>
-							</div>
 
-							<div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-								<div className="space-y-2">
-									<p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Observed Problem</p>
-									<p className="text-sm font-medium text-slate-700 leading-relaxed">{r.problem}</p>
-								</div>
-								<div className="space-y-2">
-									<p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Root Cause</p>
-									<p className="text-sm font-medium text-slate-700 leading-relaxed">{r.rootCause}</p>
-								</div>
-								<div className="space-y-2">
-									<p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Action Taken</p>
-									<p className="text-sm font-medium text-slate-700 leading-relaxed">{r.actionTaken}</p>
+								<div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+									<div className="space-y-2">
+										<p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Observed Problem</p>
+										<p className="text-sm font-medium text-slate-700 leading-relaxed line-clamp-2">{r.problem}</p>
+									</div>
+									<div className="space-y-2">
+										<p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Root Cause</p>
+										<p className="text-sm font-medium text-slate-700 leading-relaxed line-clamp-2">{r.rootCause}</p>
+									</div>
+									<div className="space-y-2">
+										<p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Action Taken</p>
+										<p className="text-sm font-medium text-slate-700 leading-relaxed line-clamp-2">{r.actionTaken}</p>
+									</div>
 								</div>
 							</div>
-						</div>
+						</Link>
 					))}
 				</div>
 			)}
