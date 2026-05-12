@@ -183,7 +183,7 @@ export default function ProtocolManagement() {
 				</div>
 				<button
 					onClick={openAdd}
-					className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-blue-500/30 transition-all flex items-center gap-2 transform hover:-translate-y-0.5"
+					className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-blue-500/30 transition-all flex items-center gap-2 transform hover:-translate-y-0.5 cursor-pointer"
 				>
 					<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -204,7 +204,7 @@ export default function ProtocolManagement() {
 				<select
 					value={testTypeFilter}
 					onChange={(e) => { setTestTypeFilter(e.target.value); setTestCategoryFilter(""); }}
-					className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest outline-none focus:ring-4 focus:ring-blue-500/10 transition-all"
+					className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest outline-none focus:ring-4 focus:ring-blue-500/10 transition-all cursor-pointer"
 				>
 					<option value="">All Test Types</option>
 					{testTypes.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
@@ -214,7 +214,7 @@ export default function ProtocolManagement() {
 					value={testCategoryFilter}
 					onChange={(e) => setTestCategoryFilter(e.target.value)}
 					disabled={!testTypeFilter}
-					className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest outline-none focus:ring-4 focus:ring-blue-500/10 transition-all disabled:opacity-30"
+					className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest outline-none focus:ring-4 focus:ring-blue-500/10 transition-all disabled:opacity-30 cursor-pointer"
 				>
 					<option value="">All Categories</option>
 					{categoriesForFilter.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -223,7 +223,7 @@ export default function ProtocolManagement() {
 				{(testTypeFilter || testCategoryFilter) && (
 					<button
 						onClick={() => { setTestTypeFilter(""); setTestCategoryFilter(""); }}
-						className="text-[10px] font-black text-rose-500 uppercase tracking-widest hover:underline"
+						className="text-[10px] font-black text-rose-500 uppercase tracking-widest hover:underline cursor-pointer"
 					>
 						Clear Filters
 					</button>
@@ -285,12 +285,12 @@ export default function ProtocolManagement() {
 									</div>
 								</div>
 								<div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-									<button onClick={() => openEdit(p)} className="p-2 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors">
+									<button onClick={() => openEdit(p)} className="p-2 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer">
 										<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
 										</svg>
 									</button>
-									<button onClick={() => setDeleteConfirm(p.id)} className="p-2 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors">
+									<button onClick={() => setDeleteConfirm(p.id)} className="p-2 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer">
 										<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
 										</svg>
@@ -308,7 +308,7 @@ export default function ProtocolManagement() {
 								</span>
 								<button
 									onClick={() => setExpandedId(expandedId === p.id ? null : p.id)}
-									className="text-sm font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 transition-colors"
+									className="text-sm font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 transition-colors cursor-pointer"
 								>
 									{expandedId === p.id ? "Collapse" : "View Details"}
 								</button>
@@ -334,10 +334,10 @@ export default function ProtocolManagement() {
 			{/* Add / Edit Modal */}
 			{showModal && (
 				<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-					<div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+					<div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto no-scrollbar animate-in fade-in zoom-in-95 duration-200">
 						<div className="bg-slate-900 px-8 py-5 flex justify-between items-center sticky top-0 z-10">
 							<h3 className="text-white font-bold">{editTarget ? "Edit Protocol" : "Add New Protocol"}</h3>
-							<button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-white transition-colors">
+							<button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-white transition-colors cursor-pointer">
 								<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
 								</svg>
@@ -364,7 +364,7 @@ export default function ProtocolManagement() {
 									<select
 										value={form.testTypeId}
 										onChange={(e) => set("testTypeId", e.target.value)}
-										className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm font-bold"
+										className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm font-bold cursor-pointer"
 									>
 										<option value="">Select Type...</option>
 										{testTypes.map(t => (
@@ -378,7 +378,7 @@ export default function ProtocolManagement() {
 										value={form.testCategoryId}
 										onChange={(e) => set("testCategoryId", e.target.value)}
 										disabled={!form.testTypeId}
-										className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm font-bold disabled:opacity-50"
+										className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm font-bold disabled:opacity-50 cursor-pointer"
 									>
 										<option value="">Select Category...</option>
 										{filteredCategories.map(c => (
@@ -398,7 +398,7 @@ export default function ProtocolManagement() {
 												key={type}
 												type="button"
 												onClick={() => toggleType(type)}
-												className={`py-3 rounded-2xl text-[10px] font-black transition-all border-2 ${isSelected
+												className={`py-3 rounded-2xl text-[10px] font-black transition-all border-2 cursor-pointer ${isSelected
 													? "bg-slate-900 border-slate-900 text-white shadow-xl shadow-slate-900/20"
 													: "bg-white border-slate-100 text-slate-400 hover:border-slate-300"
 													}`}
@@ -419,8 +419,8 @@ export default function ProtocolManagement() {
 								<textarea rows={4} value={form.judgementCriteria} onChange={(e) => set("judgementCriteria", e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm font-medium" placeholder="e.g. Motor must complete 1000 cycles without failure..." />
 							</div>
 							<div className="flex justify-end gap-3 pt-2">
-								<button type="button" onClick={() => setShowModal(false)} className="px-6 py-3 rounded-2xl font-bold text-slate-400 hover:bg-slate-50 transition-all text-sm">Cancel</button>
-								<button type="submit" disabled={saving} className="bg-slate-900 text-white font-bold py-3 px-10 rounded-2xl shadow-2xl shadow-slate-900/30 transition-all text-sm hover:bg-slate-800 disabled:bg-slate-400">
+								<button type="button" onClick={() => setShowModal(false)} className="px-6 py-3 rounded-2xl font-bold text-slate-400 hover:bg-slate-50 transition-all text-sm cursor-pointer">Cancel</button>
+								<button type="submit" disabled={saving} className="bg-slate-900 text-white font-bold py-3 px-10 rounded-2xl shadow-2xl shadow-slate-900/30 transition-all text-sm hover:bg-slate-800 disabled:bg-slate-400 cursor-pointer">
 									{saving ? "Saving..." : (editTarget ? "Update Protocol" : "Add Protocol")}
 								</button>
 							</div>
@@ -440,8 +440,8 @@ export default function ProtocolManagement() {
 						</div>
 						<h3 className="text-xl font-bold text-slate-900 mb-2">Delete Protocol?</h3>
 						<div className="flex gap-3 mt-6">
-							<button onClick={() => setDeleteConfirm(null)} className="flex-1 px-4 py-3 rounded-2xl font-bold text-slate-400 hover:bg-slate-50 text-sm transition-all">Cancel</button>
-							<button onClick={() => handleDelete(deleteConfirm)} className="flex-1 bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 rounded-2xl text-sm transition-all shadow-lg shadow-rose-500/20">Delete</button>
+							<button onClick={() => setDeleteConfirm(null)} className="flex-1 px-4 py-3 rounded-2xl font-bold text-slate-400 hover:bg-slate-50 text-sm transition-all cursor-pointer">Cancel</button>
+							<button onClick={() => handleDelete(deleteConfirm)} className="flex-1 bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 rounded-2xl text-sm transition-all shadow-lg shadow-rose-500/20 cursor-pointer">Delete</button>
 						</div>
 					</div>
 				</div>

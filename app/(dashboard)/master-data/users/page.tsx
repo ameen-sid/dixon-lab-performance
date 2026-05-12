@@ -234,7 +234,7 @@ export default function UserManagementPage() {
 				</div>
 				<button
 					onClick={() => openModal()}
-					className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-blue-500/30 transition-all flex items-center gap-2 transform hover:-translate-y-0.5"
+					className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-blue-500/30 transition-all flex items-center gap-2 transform hover:-translate-y-0.5 cursor-pointer"
 				>
 					<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
@@ -293,7 +293,7 @@ export default function UserManagementPage() {
 						<select
 							value={roleFilter}
 							onChange={(e) => setRoleFilter(e.target.value)}
-							className="px-3 py-2 bg-white border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest outline-none focus:ring-4 focus:ring-blue-500/10"
+							className="px-3 py-2 bg-white border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest outline-none focus:ring-4 focus:ring-blue-500/10 cursor-pointer"
 						>
 							<option value="">All Roles</option>
 							{ROLES.map(r => <option key={r} value={r}>{r}</option>)}
@@ -302,7 +302,7 @@ export default function UserManagementPage() {
 						<select
 							value={deptFilter}
 							onChange={(e) => setDeptFilter(e.target.value)}
-							className="px-3 py-2 bg-white border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest outline-none focus:ring-4 focus:ring-blue-500/10 max-w-[150px]"
+							className="px-3 py-2 bg-white border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest outline-none focus:ring-4 focus:ring-blue-500/10 max-w-[150px] cursor-pointer"
 						>
 							<option value="">All Departments</option>
 							{departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
@@ -311,7 +311,7 @@ export default function UserManagementPage() {
 						{(search || roleFilter || deptFilter) && (
 							<button
 								onClick={() => { setSearch(""); setRoleFilter(""); setDeptFilter(""); }}
-								className="text-[10px] font-black text-rose-500 uppercase tracking-widest hover:underline"
+								className="text-[10px] font-black text-rose-500 uppercase tracking-widest hover:underline cursor-pointer"
 							>
 								Clear
 							</button>
@@ -374,7 +374,7 @@ export default function UserManagementPage() {
 											<div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
 												<button
 													onClick={() => openModal(user)}
-													className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+													className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all cursor-pointer"
 													title="Edit User"
 												>
 													<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -383,7 +383,7 @@ export default function UserManagementPage() {
 												</button>
 												<button
 													onClick={() => openDeleteModal(user)}
-													className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+													className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all cursor-pointer"
 													title="Delete User"
 												>
 													<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -409,14 +409,14 @@ export default function UserManagementPage() {
 							<button
 								disabled={currentPage === 1}
 								onClick={() => setCurrentPage(p => p - 1)}
-								className="px-4 py-2 rounded-xl border border-slate-200 text-[10px] font-black uppercase tracking-widest bg-white disabled:opacity-30 hover:bg-slate-50 transition-colors"
+								className="px-4 py-2 rounded-xl border border-slate-200 text-[10px] font-black uppercase tracking-widest bg-white disabled:opacity-30 hover:bg-slate-50 transition-colors cursor-pointer"
 							>
 								Previous
 							</button>
 							<button
 								disabled={currentPage === totalPages}
 								onClick={() => setCurrentPage(p => p + 1)}
-								className="px-4 py-2 rounded-xl border border-slate-200 text-[10px] font-black uppercase tracking-widest bg-white disabled:opacity-30 hover:bg-slate-50 transition-colors"
+								className="px-4 py-2 rounded-xl border border-slate-200 text-[10px] font-black uppercase tracking-widest bg-white disabled:opacity-30 hover:bg-slate-50 transition-colors cursor-pointer"
 							>
 								Next
 							</button>
@@ -428,7 +428,7 @@ export default function UserManagementPage() {
 			{/* Add User Modal */}
 			{showModal && (
 				<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-					<div className="bg-white rounded-3xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+					<div className="bg-white rounded-3xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto no-scrollbar animate-in fade-in zoom-in-95 duration-200">
 						<div className="bg-slate-900 px-8 py-5 flex justify-between items-center rounded-t-3xl sticky top-0 z-10">
 							<h3 className="text-white font-bold flex items-center gap-2">
 								<svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -436,7 +436,7 @@ export default function UserManagementPage() {
 								</svg>
 								{editingUser ? `Edit User: ${editingUser.name}` : "Create New User"}
 							</h3>
-							<button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-white transition-colors">
+							<button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-white transition-colors cursor-pointer">
 								<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
 								</svg>
@@ -465,7 +465,7 @@ export default function UserManagementPage() {
 
 								<div>
 									<label className="block text-sm font-semibold text-slate-700 mb-1.5 ml-1">Access Role <span className="text-red-500">*</span></label>
-									<select value={form.role} onChange={(e) => handleChange("role", e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm">
+									<select value={form.role} onChange={(e) => handleChange("role", e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm cursor-pointer">
 										{ROLES.map(r => (
 											<option
 												key={r}
@@ -485,7 +485,7 @@ export default function UserManagementPage() {
 										value={form.departmentId}
 										disabled={["Admin", "CEO"].includes(form.role)}
 										onChange={(e) => handleChange("departmentId", e.target.value)}
-										className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm disabled:opacity-50"
+										className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm disabled:opacity-50 cursor-pointer"
 									>
 										<option value="">Select Department</option>
 										{departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
@@ -503,8 +503,8 @@ export default function UserManagementPage() {
 							</div>
 
 							<div className="flex justify-end gap-3 pt-2">
-								<button type="button" onClick={() => setShowModal(false)} className="px-5 py-2.5 rounded-xl font-semibold text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all text-sm">Cancel</button>
-								<button type="submit" disabled={saving} className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-slate-400 disabled:to-slate-400 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg shadow-blue-500/20 transition-all text-sm flex items-center gap-2">
+								<button type="button" onClick={() => setShowModal(false)} className="px-5 py-2.5 rounded-xl font-semibold text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all text-sm cursor-pointer">Cancel</button>
+								<button type="submit" disabled={saving} className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-slate-400 disabled:to-slate-400 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg shadow-blue-500/20 transition-all text-sm flex items-center gap-2 cursor-pointer">
 									{saving ? "Saving..." : (editingUser ? "Update User" : "Create User")}
 								</button>
 							</div>
@@ -527,8 +527,8 @@ export default function UserManagementPage() {
 							Are you sure you want to remove <span className="font-bold text-slate-700">@{userToDelete.username}</span>?
 						</p>
 						<div className="flex gap-3">
-							<button onClick={() => setShowDeleteModal(false)} className="flex-1 px-4 py-2.5 rounded-xl font-semibold text-slate-600 border border-slate-200 hover:bg-slate-50 text-sm">Cancel</button>
-							<button onClick={handleDelete} disabled={deleting} className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-sm">Delete</button>
+							<button onClick={() => setShowDeleteModal(false)} className="flex-1 px-4 py-2.5 rounded-xl font-semibold text-slate-600 border border-slate-200 hover:bg-slate-50 text-sm cursor-pointer">Cancel</button>
+							<button onClick={handleDelete} disabled={deleting} className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-sm cursor-pointer">Delete</button>
 						</div>
 					</div>
 				</div>

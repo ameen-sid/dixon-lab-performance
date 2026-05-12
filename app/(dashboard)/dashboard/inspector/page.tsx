@@ -23,6 +23,20 @@ export default async function InspectorDashboard() {
 
 	const totalLogs = await prisma.dailyChecksheet.count();
 
+	// Calculate Integrity Rating (Success Rate)
+	const finishedTests = await prisma.testPlan.findMany({
+		where: {
+			status: { in: ["APPROVED", "COMPLETED", "FAILED"] }
+		},
+		select: { status: true }
+	});
+
+	const totalFinished = finishedTests.length;
+	const passedTests = finishedTests.filter(t => ["APPROVED", "COMPLETED"].includes(t.status)).length;
+	const integrityRating = totalFinished > 0 
+		? Math.round((passedTests / totalFinished) * 100) 
+		: 100; // Default to 100% if no tests have finished yet
+
 	return (
 		<div className="h-[calc(100vh-10rem)] overflow-hidden animate-in fade-in duration-700 flex flex-col">
 			{/* Executive Header */}
@@ -92,7 +106,7 @@ export default async function InspectorDashboard() {
 						<div className="flex justify-between items-start mb-4 relative z-10">
 							<div className="space-y-1">
 								<p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Integrity Rating</p>
-								<p className="text-5xl font-black text-slate-900 tracking-tighter">99%</p>
+								<p className="text-5xl font-black text-slate-900 tracking-tighter">{integrityRating}%</p>
 								<p className="text-[10px] font-bold text-slate-300 italic mt-2">Optimal Variance</p>
 							</div>
 							<div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-500">

@@ -126,7 +126,7 @@ export default function TopEquipmentManagement() {
 				</div>
 				<button 
 					onClick={openAdd}
-					className="px-6 py-2.5 bg-rose-500 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-rose-500/20 hover:bg-rose-600 transition-all active:scale-95 flex items-center gap-2"
+					className="px-6 py-2.5 bg-rose-500 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-rose-500/20 hover:bg-rose-600 transition-all active:scale-95 flex items-center gap-2 cursor-pointer"
 				>
 					<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" /></svg>
 					Register Rig
@@ -203,13 +203,13 @@ export default function TopEquipmentManagement() {
 											<div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
 												<button
 													onClick={() => openEdit(item)}
-													className="p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-white rounded-xl border border-transparent hover:border-emerald-100 shadow-sm transition-all"
+													className="p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-white rounded-xl border border-transparent hover:border-emerald-100 shadow-sm transition-all cursor-pointer"
 												>
 													<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
 												</button>
 												<button
 													onClick={() => { setDeleteConfirm(item.id); }}
-													className="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-white rounded-xl border border-transparent hover:border-rose-100 shadow-sm transition-all"
+													className="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-white rounded-xl border border-transparent hover:border-rose-100 shadow-sm transition-all cursor-pointer"
 												>
 													<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
 												</button>
@@ -232,7 +232,7 @@ export default function TopEquipmentManagement() {
 								<p className="text-[10px] font-black text-white/50 uppercase tracking-[0.3em]">Hardware Abstraction</p>
 								<h3 className="text-2xl font-black text-white mt-1 tracking-tight">{editTarget ? "Modify Rig" : "Initialize Platform"}</h3>
 							</div>
-							<button onClick={() => setShowModal(false)} className="w-10 h-10 bg-white/10 hover:bg-white/20 text-white flex items-center justify-center rounded-2xl transition-all">
+							<button onClick={() => setShowModal(false)} className="w-10 h-10 bg-white/10 hover:bg-white/20 text-white flex items-center justify-center rounded-2xl transition-all cursor-pointer">
 								<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" /></svg>
 							</button>
 						</div>
@@ -259,7 +259,7 @@ export default function TopEquipmentManagement() {
 											key={s}
 											type="button"
 											onClick={() => setForm({ ...form, status: s as any })}
-											className={`py-4 rounded-2xl text-[10px] font-black transition-all border-2 shadow-sm ${
+											className={`py-4 rounded-2xl text-[10px] font-black transition-all border-2 shadow-sm cursor-pointer ${
 												form.status === s
 													? "bg-slate-900 border-slate-900 text-white shadow-xl shadow-slate-900/30"
 													: "bg-white border-slate-100 text-slate-400 hover:border-emerald-200 hover:text-emerald-600"
@@ -272,8 +272,8 @@ export default function TopEquipmentManagement() {
 							</div>
 
 							<div className="flex gap-4 pt-6 border-t border-slate-100">
-								<button type="button" onClick={() => setShowModal(false)} className="flex-1 px-8 py-4 rounded-2xl font-black text-slate-400 hover:text-slate-600 transition-all text-[11px] uppercase tracking-widest">Discard</button>
-								<button type="submit" disabled={saving} className="flex-[2] bg-slate-900 text-white font-black py-4 rounded-2xl shadow-2xl shadow-slate-900/30 transition-all text-[11px] uppercase tracking-[0.25em] hover:bg-black active:scale-95">
+								<button type="button" onClick={() => setShowModal(false)} className="flex-1 px-8 py-4 rounded-2xl font-black text-slate-400 hover:text-slate-600 transition-all text-[11px] uppercase tracking-widest cursor-pointer">Discard</button>
+								<button type="submit" disabled={saving} className="flex-[2] bg-slate-900 text-white font-black py-4 rounded-2xl shadow-2xl shadow-slate-900/30 transition-all text-[11px] uppercase tracking-[0.25em] hover:bg-black active:scale-95 cursor-pointer">
 									{saving ? "Storing..." : (editTarget ? "Update Hardware" : "Confirm Platform")}
 								</button>
 							</div>
@@ -292,8 +292,8 @@ export default function TopEquipmentManagement() {
 						<h3 className="text-xl font-black text-slate-900 mb-2">Purge Hardware?</h3>
 						<p className="text-slate-400 text-[10px] font-bold leading-relaxed mb-8 uppercase tracking-widest">This platform will be decommissioned. Active cycles may be orphaned.</p>
 						<div className="flex gap-4">
-							<button onClick={() => setDeleteConfirm(null)} className="flex-1 px-4 py-4 rounded-2xl font-black text-slate-400 hover:bg-slate-50 text-[10px] uppercase tracking-widest transition-all">Go Back</button>
-							<button onClick={() => handleDelete(deleteConfirm)} className="flex-1 bg-rose-500 hover:bg-rose-600 text-white font-black py-4 rounded-2xl text-[10px] uppercase tracking-widest shadow-xl shadow-rose-500/20 active:scale-95 transition-all">Confirm</button>
+							<button onClick={() => setDeleteConfirm(null)} className="flex-1 px-4 py-4 rounded-2xl font-black text-slate-400 hover:bg-slate-50 text-[10px] uppercase tracking-widest transition-all cursor-pointer">Go Back</button>
+							<button onClick={() => handleDelete(deleteConfirm)} className="flex-1 bg-rose-500 hover:bg-rose-600 text-white font-black py-4 rounded-2xl text-[10px] uppercase tracking-widest shadow-xl shadow-rose-500/20 active:scale-95 transition-all cursor-pointer">Confirm</button>
 						</div>
 					</div>
 				</div>

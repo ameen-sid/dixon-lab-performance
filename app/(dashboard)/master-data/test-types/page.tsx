@@ -125,7 +125,7 @@ export default function TestTypeManagement() {
 					</div>
 					<button
 						onClick={openAdd}
-						className="bg-slate-900 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-slate-900/20 transition-all flex items-center gap-2 transform hover:-translate-y-0.5"
+						className="bg-slate-900 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-slate-900/20 transition-all flex items-center gap-2 transform hover:-translate-y-0.5 cursor-pointer"
 					>
 						<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -178,12 +178,12 @@ export default function TestTypeManagement() {
 										</td>
 										<td className="px-6 py-4 text-right">
 											<div className="flex items-center justify-end gap-2">
-												<button onClick={() => openEdit(t)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all">
+												<button onClick={() => openEdit(t)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all cursor-pointer">
 													<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 														<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
 													</svg>
 												</button>
-												<button onClick={() => setDeleteConfirm(t.id)} className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all">
+												<button onClick={() => setDeleteConfirm(t.id)} className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all cursor-pointer">
 													<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 														<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
 													</svg>
@@ -203,7 +203,7 @@ export default function TestTypeManagement() {
 					<div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-200">
 						<div className="bg-slate-900 px-8 py-5 flex justify-between items-center sticky top-0 z-10">
 							<h3 className="text-white font-bold">{editTarget ? "Edit Test Type" : "Add Test Type"}</h3>
-							<button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-white transition-colors">
+							<button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-white transition-colors cursor-pointer">
 								<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
 								</svg>
@@ -222,8 +222,8 @@ export default function TestTypeManagement() {
 								/>
 							</div>
 							<div className="flex justify-end gap-3 pt-2">
-								<button type="button" onClick={() => setShowModal(false)} className="px-6 py-3 rounded-2xl font-bold text-slate-400 hover:bg-slate-50 transition-all text-sm">Cancel</button>
-								<button type="submit" disabled={saving} className="bg-slate-900 text-white font-bold py-3 px-8 rounded-2xl shadow-xl shadow-slate-900/20 transition-all text-sm hover:bg-slate-800 disabled:bg-slate-400">
+								<button type="button" onClick={() => setShowModal(false)} className="px-6 py-3 rounded-2xl font-bold text-slate-400 hover:bg-slate-50 transition-all text-sm cursor-pointer">Cancel</button>
+								<button type="submit" disabled={saving} className="bg-slate-900 text-white font-bold py-3 px-8 rounded-2xl shadow-xl shadow-slate-900/20 transition-all text-sm hover:bg-slate-800 disabled:bg-slate-400 cursor-pointer">
 									{saving ? "Saving..." : "Save Test Type"}
 								</button>
 							</div>
@@ -243,8 +243,8 @@ export default function TestTypeManagement() {
 						<h3 className="text-xl font-bold text-slate-900 mb-2">Delete Test Type?</h3>
 						<p className="text-slate-500 mb-6 font-medium">Are you sure? This action cannot be undone.</p>
 						<div className="flex gap-3">
-							<button onClick={() => setDeleteConfirm(null)} className="flex-1 px-4 py-3 rounded-2xl font-bold text-slate-400 hover:bg-slate-50 text-sm transition-all">No, Cancel</button>
-							<button onClick={() => handleDelete(deleteConfirm)} className="flex-1 bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 rounded-2xl text-sm transition-all shadow-lg shadow-rose-500/20">Yes, Delete</button>
+							<button onClick={() => setDeleteConfirm(null)} className="flex-1 px-4 py-3 rounded-2xl font-bold text-slate-400 hover:bg-slate-50 text-sm transition-all cursor-pointer">No, Cancel</button>
+							<button onClick={() => handleDelete(deleteConfirm)} className="flex-1 bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 rounded-2xl text-sm transition-all shadow-lg shadow-rose-500/20 cursor-pointer">Yes, Delete</button>
 						</div>
 					</div>
 				</div>

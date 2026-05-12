@@ -10,10 +10,13 @@ export default async function HeadDashboard() {
 		redirect("/login");
 	}
 
-	// 1. Fetch Test Plans with Categories for the Cards
-	const testPlans = await prisma.testPlan.findMany({
-		include: { testType: true }
-	});
+	// 1. Fetch data in parallel to optimize connection usage and speed
+	const [testPlans, requestStats, testStats, capaGroup] = await Promise.all([
+		prisma.testPlan.findMany({ include: { testType: true } }),
+		prisma.testRequest.groupBy({ by: ['status'], _count: true }),
+		prisma.testPlan.groupBy({ by: ['status'], _count: true }),
+		prisma.capaReport.groupBy({ by: ['submittedById'], _count: true }),
+	]);
 
 	const targetCategories = ["Performance", "Reliability", "NABL"];
 	
@@ -28,8 +31,7 @@ export default async function HeadDashboard() {
 		return { name: catName, total, pass, ongoing, failed };
 	});
 
-	// --- Existing Chart Data Fetching ---
-	const requestStats = await prisma.testRequest.groupBy({ by: ['status'], _count: true });
+	// --- Process Statistics ---
 	let totalRequests = 0, pendingReq = 0, approvedReq = 0, rejectedReq = 0;
 	requestStats.forEach((stat) => {
 		totalRequests += stat._count;
@@ -44,7 +46,6 @@ export default async function HeadDashboard() {
 		{ name: 'Rejected', count: rejectedReq },
 	];
 
-	const testStats = await prisma.testPlan.groupBy({ by: ['status'], _count: true });
 	let completedReports = 0, failureReports = 0;
 	testStats.forEach((stat) => {
 		if (stat.status === "PENDING_APPROVAL" || stat.status === "COMPLETED" || stat.status === "APPROVED") completedReports += stat._count;
@@ -55,7 +56,6 @@ export default async function HeadDashboard() {
 		{ name: 'Failure Reports', value: failureReports },
 	];
 
-	const capaGroup = await prisma.capaReport.groupBy({ by: ['submittedById'], _count: true });
 	const userIds = capaGroup.map(g => g.submittedById);
 	const users = await prisma.user.findMany({ where: { id: { in: userIds } } });
 	const userMap = new Map(users.map(u => [u.id, u.name]));

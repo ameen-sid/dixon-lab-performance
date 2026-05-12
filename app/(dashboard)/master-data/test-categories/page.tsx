@@ -158,7 +158,7 @@ export default function TestCategoryManagement() {
 					</div>
 					<button
 						onClick={openAdd}
-						className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-blue-500/30 transition-all flex items-center gap-2 transform hover:-translate-y-0.5"
+						className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-blue-500/30 transition-all flex items-center gap-2 transform hover:-translate-y-0.5 cursor-pointer"
 					>
 						<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -222,7 +222,7 @@ export default function TestCategoryManagement() {
 											<div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
 												<button
 													onClick={() => openEdit(c)}
-													className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+													className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all cursor-pointer"
 													title="Edit"
 												>
 													<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -231,7 +231,7 @@ export default function TestCategoryManagement() {
 												</button>
 												<button
 													onClick={() => setDeleteConfirm(c.id)}
-													className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+													className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all cursor-pointer"
 													title="Delete"
 												>
 													<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -257,14 +257,14 @@ export default function TestCategoryManagement() {
 							<button
 								disabled={currentPage === 1}
 								onClick={() => setCurrentPage(p => p - 1)}
-								className="px-4 py-2 rounded-xl border border-slate-200 text-[10px] font-black uppercase tracking-widest bg-white disabled:opacity-30 hover:bg-slate-50 transition-colors"
+								className="px-4 py-2 rounded-xl border border-slate-200 text-[10px] font-black uppercase tracking-widest bg-white disabled:opacity-30 hover:bg-slate-50 transition-colors cursor-pointer"
 							>
 								Previous
 							</button>
 							<button
 								disabled={currentPage === totalPages}
 								onClick={() => setCurrentPage(p => p + 1)}
-								className="px-4 py-2 rounded-xl border border-slate-200 text-[10px] font-black uppercase tracking-widest bg-white disabled:opacity-30 hover:bg-slate-50 transition-colors"
+								className="px-4 py-2 rounded-xl border border-slate-200 text-[10px] font-black uppercase tracking-widest bg-white disabled:opacity-30 hover:bg-slate-50 transition-colors cursor-pointer"
 							>
 								Next
 							</button>
@@ -276,12 +276,12 @@ export default function TestCategoryManagement() {
 			{/* Modal with Test Type Dropdown */}
 			{showModal && (
 				<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-					<div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+					<div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto no-scrollbar animate-in fade-in zoom-in-95 duration-200">
 						<div className="bg-slate-900 px-8 py-5 flex justify-between items-center rounded-t-3xl sticky top-0 z-10">
 							<h3 className="text-white font-bold flex items-center gap-2">
 								{editTarget ? "Edit Category" : "Add Category"}
 							</h3>
-							<button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-white transition-colors">
+							<button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-white transition-colors cursor-pointer">
 								<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
 								</svg>
@@ -295,7 +295,7 @@ export default function TestCategoryManagement() {
 								<select
 									value={testTypeIdInput}
 									onChange={(e) => setTestTypeIdInput(e.target.value)}
-									className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm font-medium"
+									className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm font-medium cursor-pointer"
 								>
 									<option value="">Select Test Type...</option>
 									{testTypes.map(t => (
@@ -327,10 +327,10 @@ export default function TestCategoryManagement() {
 								</div>
 							</div>
 							<div className="flex justify-end gap-3 pt-2">
-								<button type="button" onClick={() => setShowModal(false)} className="px-5 py-2.5 rounded-xl font-semibold text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all text-sm">
+								<button type="button" onClick={() => setShowModal(false)} className="px-5 py-2.5 rounded-xl font-semibold text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all text-sm cursor-pointer">
 									Cancel
 								</button>
-								<button type="submit" disabled={saving} className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-slate-400 disabled:to-slate-400 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg shadow-blue-500/20 transition-all text-sm flex items-center gap-2">
+								<button type="submit" disabled={saving} className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-slate-400 disabled:to-slate-400 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg shadow-blue-500/20 transition-all text-sm flex items-center gap-2 cursor-pointer">
 									{saving ? "Saving..." : (editTarget ? "Update Record" : "Save Record")}
 								</button>
 							</div>
@@ -351,8 +351,8 @@ export default function TestCategoryManagement() {
 						<h3 className="text-lg font-bold text-slate-900 mb-2">Delete Record?</h3>
 						<p className="text-sm text-slate-500 mb-6">This action cannot be undone.</p>
 						<div className="flex gap-3">
-							<button onClick={() => setDeleteConfirm(null)} className="flex-1 px-4 py-2.5 rounded-xl font-semibold text-slate-600 border border-slate-200 hover:bg-slate-50 text-sm">Cancel</button>
-							<button onClick={() => handleDelete(deleteConfirm)} className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-sm">Delete</button>
+							<button onClick={() => setDeleteConfirm(null)} className="flex-1 px-4 py-2.5 rounded-xl font-semibold text-slate-600 border border-slate-200 hover:bg-slate-50 text-sm cursor-pointer">Cancel</button>
+							<button onClick={() => handleDelete(deleteConfirm)} className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-sm cursor-pointer">Delete</button>
 						</div>
 					</div>
 				</div>
