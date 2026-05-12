@@ -61,7 +61,7 @@ export default function ChecksheetPage({ params }: { params: Promise<{ id: strin
 		while (curr <= end) {
 			const dateStr = curr.toISOString().split("T")[0];
 			const log = plan.dailyLogs.find(l => new Date(l.date).toISOString().split("T")[0] === dateStr);
-			
+
 			rows.push({
 				date: dateStr,
 				data: log || {}
@@ -88,7 +88,7 @@ export default function ChecksheetPage({ params }: { params: Promise<{ id: strin
 		{ label: "Lid Switch", field: "lidSwitch" },
 		{ label: "Inverter", field: "inverterBoard" }
 	];
-	
+
 	const satlCols = [
 		{ label: "Wash Motor", field: "washMotor" },
 		{ label: "Spin Motor", field: "spinMotor" },
@@ -123,7 +123,7 @@ export default function ChecksheetPage({ params }: { params: Promise<{ id: strin
 
 			{/* THE EXCEL SHEET */}
 			<div className="bg-white border-[2px] border-black shadow-2xl overflow-hidden print:shadow-none print:border-black">
-				
+
 				{/* SHEET TITLE */}
 				<div className="bg-slate-200 border-b-[2px] border-black p-2 text-center font-black text-base uppercase tracking-widest text-slate-900 flex justify-between items-center px-6">
 					<div className="text-[10px] italic text-slate-500">QC Laboratory</div>
@@ -178,11 +178,11 @@ export default function ChecksheetPage({ params }: { params: Promise<{ id: strin
 							{sheetRows.map((row) => (
 								<tr key={row.date} className="h-10 border-b border-black text-center hover:bg-blue-50/30 transition-colors">
 									<td className="border-r-[2px] border-black font-black bg-slate-50/50">{format(new Date(row.date), "dd-MM-yyyy")}</td>
-									
+
 									{/* Load Condition */}
 									<td className="border-r-[2px] border-black relative">
-										<input 
-											type="text" 
+										<input
+											type="text"
 											defaultValue={row.data.loadCondition || ""}
 											onBlur={(e) => handleInlineUpdate(row.date, "loadCondition", e.target.value)}
 											className={`w-full h-full p-2 bg-transparent outline-none text-[9px] text-center ${savingField === `${row.date}-loadCondition` ? 'bg-yellow-50 animate-pulse' : ''}`}
@@ -192,8 +192,8 @@ export default function ChecksheetPage({ params }: { params: Promise<{ id: strin
 									{/* Cycles */}
 									{isFATL && (
 										<td className="border-r-[2px] border-black relative bg-blue-50/20">
-											<input 
-												type="number" 
+											<input
+												type="number"
 												defaultValue={row.data.numCycles || ""}
 												onBlur={(e) => handleInlineUpdate(row.date, "numCycles", e.target.value)}
 												className="w-full h-full p-2 bg-transparent outline-none font-black text-blue-700 text-center"
@@ -203,16 +203,16 @@ export default function ChecksheetPage({ params }: { params: Promise<{ id: strin
 									{isSATL && (
 										<>
 											<td className="border-r-[2px] border-black relative bg-blue-50/20">
-												<input 
-													type="number" 
+												<input
+													type="number"
 													defaultValue={row.data.numCyclesWash || ""}
 													onBlur={(e) => handleInlineUpdate(row.date, "numCyclesWash", e.target.value)}
 													className="w-full h-full p-2 bg-transparent outline-none font-black text-blue-700 text-center"
 												/>
 											</td>
 											<td className="border-r-[2px] border-black relative bg-blue-50/20">
-												<input 
-													type="number" 
+												<input
+													type="number"
 													defaultValue={row.data.numCyclesSpin || ""}
 													onBlur={(e) => handleInlineUpdate(row.date, "numCyclesSpin", e.target.value)}
 													className="w-full h-full p-2 bg-transparent outline-none font-black text-blue-700 text-center"
@@ -224,8 +224,8 @@ export default function ChecksheetPage({ params }: { params: Promise<{ id: strin
 									{/* Components */}
 									{(isFATL ? fatlCols : satlCols).map(col => (
 										<td key={col.field} className="border-r-[2px] border-black relative">
-											<input 
-												type="text" 
+											<input
+												type="text"
 												defaultValue={row.data[col.field] || ""}
 												onBlur={(e) => handleInlineUpdate(row.date, col.field, e.target.value)}
 												className={`w-full h-full p-2 bg-transparent outline-none text-center uppercase ${savingField === `${row.date}-${col.field}` ? 'bg-yellow-50 animate-pulse' : ''}`}
@@ -236,8 +236,8 @@ export default function ChecksheetPage({ params }: { params: Promise<{ id: strin
 
 									{/* Total Cycles */}
 									<td className="border-r-[2px] border-black relative bg-slate-50">
-										<input 
-											type="number" 
+										<input
+											type="number"
 											defaultValue={row.data.totalCycles || ""}
 											onBlur={(e) => handleInlineUpdate(row.date, "totalCycles", e.target.value)}
 											className="w-full h-full p-2 bg-transparent outline-none font-black text-slate-900 text-center"
@@ -246,8 +246,8 @@ export default function ChecksheetPage({ params }: { params: Promise<{ id: strin
 
 									{/* Remarks */}
 									<td className="relative">
-										<input 
-											type="text" 
+										<input
+											type="text"
 											defaultValue={row.data.remarks || ""}
 											onBlur={(e) => handleInlineUpdate(row.date, "remarks", e.target.value)}
 											className="w-full h-full px-3 py-2 bg-transparent outline-none text-left italic text-[9px] text-slate-500"

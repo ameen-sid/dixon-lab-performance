@@ -155,7 +155,7 @@ export default function InspectionForm({ request, user, onSubmit }: Props) {
 												}`}
 										>
 											{imagePreview ? (
-												<div 
+												<div
 													onClick={(e) => {
 														if (isViewOnly && imagePreview) {
 															e.stopPropagation();

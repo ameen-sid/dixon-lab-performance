@@ -27,7 +27,7 @@ export default async function InspectionPage({ params }: { params: Promise<{ id:
 
 	async function submitInspection(formData: FormData) {
 		"use server";
-		
+
 		const p1 = formData.get("point1") as string;
 		const p2 = formData.get("point2") as string;
 		const p3 = formData.get("point3") as string;
@@ -45,14 +45,14 @@ export default async function InspectionPage({ params }: { params: Promise<{ id:
 		if (file && file.size > 0) {
 			const bytes = await file.arrayBuffer();
 			const buffer = Buffer.from(bytes);
-			
+
 			const uploadDir = path.join(process.cwd(), "public", "uploads");
 			// Ensure directory exists
 			await mkdir(uploadDir, { recursive: true });
-			
+
 			const fileName = `inspection_${requestId}_${Date.now()}${path.extname(file.name) || ".jpg"}`;
 			const filePath = path.join(uploadDir, fileName);
-			
+
 			await writeFile(filePath, buffer);
 			imageUrl = `/uploads/${fileName}`;
 		}
@@ -73,7 +73,7 @@ export default async function InspectionPage({ params }: { params: Promise<{ id:
 			accessoriesReceived: p9,
 			allottedId: formData.get("point10") as string,
 			remarks: formData.get("point11") as string,
-			imageUrl: imageUrl, 
+			imageUrl: imageUrl,
 			isPassed: isPassed,
 			inspectedById: user!.userId,
 			inspectedBy: user!.username,
@@ -86,7 +86,7 @@ export default async function InspectionPage({ params }: { params: Promise<{ id:
 		});
 
 		revalidatePath(`/dashboard/engineer/inspect/${requestId}`);
-		
+
 		if (user!.role === "Lab Manager") {
 			redirect("/dashboard/manager/assigned-samples");
 		} else {
@@ -95,10 +95,10 @@ export default async function InspectionPage({ params }: { params: Promise<{ id:
 	}
 
 	return (
-		<InspectionForm 
-			request={request} 
-			user={user} 
-			onSubmit={submitInspection} 
+		<InspectionForm
+			request={request}
+			user={user}
+			onSubmit={submitInspection}
 		/>
 	);
 }

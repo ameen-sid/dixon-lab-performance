@@ -26,12 +26,20 @@ export default function HeadReportsClient({ initialReports, filter }: { initialR
 	}, [reports, fromDate, toDate]);
 
 	const { pendingReports, finalizedReports } = useMemo(() => {
-		// Pending are those that are FAILED and haven't had a head decision yet
-		const pending = filteredReports.filter(r => r.status === "FAILED" && !r.headDecision);
-		// Finalized are those with a head decision OR those that are already REJECTED/APPROVED (for legacy data)
+		// Pending are those that haven't had a head decision yet and match the current view (Failed vs Normal Approval)
+		const pending = filteredReports.filter(r => {
+			if (r.headDecision) return false;
+			if (filter === "failed") {
+				return r.status === "FAILED";
+			} else {
+				return ["PENDING_APPROVAL", "COMPLETED"].includes(r.status);
+			}
+		});
+
+		// Finalized are those with a head decision OR those that are already REJECTED/APPROVED
 		const finalized = filteredReports.filter(r => r.headDecision || r.status === "REJECTED" || r.status === "APPROVED");
 		return { pendingReports: pending, finalizedReports: finalized };
-	}, [filteredReports]);
+	}, [filteredReports, filter]);
 
 	const handleActionInitiate = (id: number, action: string) => {
 		let title = "Approve Test Result";
