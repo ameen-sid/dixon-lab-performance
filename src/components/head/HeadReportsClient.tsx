@@ -26,8 +26,10 @@ export default function HeadReportsClient({ initialReports, filter }: { initialR
 	}, [reports, fromDate, toDate]);
 
 	const { pendingReports, finalizedReports } = useMemo(() => {
-		const pending = filteredReports.filter(r => r.status !== "APPROVED");
-		const finalized = filteredReports.filter(r => r.status === "APPROVED");
+		// Pending are those that are FAILED and haven't had a head decision yet
+		const pending = filteredReports.filter(r => r.status === "FAILED" && !r.headDecision);
+		// Finalized are those with a head decision OR those that are already REJECTED/APPROVED (for legacy data)
+		const finalized = filteredReports.filter(r => r.headDecision || r.status === "REJECTED" || r.status === "APPROVED");
 		return { pendingReports: pending, finalizedReports: finalized };
 	}, [filteredReports]);
 
@@ -55,12 +57,7 @@ export default function HeadReportsClient({ initialReports, filter }: { initialR
 			});
 			if (res.ok) {
 				const updated = await res.json();
-				// If approved, keep in list but update status. If failed/returned, remove if filter is right
-				if (decisionTarget.action === "APPROVE") {
-					setReports(prev => prev.map(r => r.id === decisionTarget.id ? { ...r, status: "APPROVED" } : r));
-				} else {
-					setReports(prev => prev.filter(r => r.id !== decisionTarget.id));
-				}
+				setReports(prev => prev.map(r => r.id === decisionTarget.id ? { ...r, status: updated.status, headDecision: updated.headDecision } : r));
 				setDecisionTarget(null);
 			}
 		} catch { /* fail */ }
@@ -87,7 +84,7 @@ export default function HeadReportsClient({ initialReports, filter }: { initialR
 							type="date"
 							value={fromDate}
 							onChange={(e) => setFromDate(e.target.value)}
-							className="px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold focus:ring-2 focus:ring-blue-500/20 outline-none"
+							className="px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold focus:ring-2 focus:ring-blue-500/20 outline-none cursor-pointer"
 						/>
 					</div>
 					<div className="flex flex-col gap-1">
@@ -96,12 +93,12 @@ export default function HeadReportsClient({ initialReports, filter }: { initialR
 							type="date"
 							value={toDate}
 							onChange={(e) => setToDate(e.target.value)}
-							className="px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold focus:ring-2 focus:ring-blue-500/20 outline-none"
+							className="px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold focus:ring-2 focus:ring-blue-500/20 outline-none cursor-pointer"
 						/>
 					</div>
 					<button
 						onClick={() => { setFromDate(""); setToDate(""); }}
-						className="mt-4 px-4 py-2 text-slate-400 hover:text-blue-600 font-black text-[10px] uppercase tracking-widest transition-colors"
+						className="mt-4 px-4 py-2 text-slate-400 hover:text-blue-600 font-black text-[10px] uppercase tracking-widest transition-colors cursor-pointer"
 					>
 						Clear
 					</button>
@@ -148,7 +145,7 @@ export default function HeadReportsClient({ initialReports, filter }: { initialR
 										<a
 											href={`/api/reports/test-plan/${report.id}`}
 											target="_blank"
-											className="px-6 py-3 rounded-2xl bg-blue-50 text-blue-700 font-black text-[10px] uppercase tracking-widest border border-blue-200 hover:bg-blue-100 transition-all flex items-center gap-2 shadow-sm shadow-blue-100"
+											className="px-6 py-3 rounded-2xl bg-blue-50 text-blue-700 font-black text-[10px] uppercase tracking-widest border border-blue-200 hover:bg-blue-100 transition-all flex items-center gap-2 shadow-sm shadow-blue-100 cursor-pointer"
 										>
 											<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -159,7 +156,7 @@ export default function HeadReportsClient({ initialReports, filter }: { initialR
 										{filter !== "failed" ? (
 											<button
 												onClick={() => handleActionInitiate(report.id, "APPROVE")}
-												className="px-7 py-3 rounded-2xl bg-emerald-600 text-white font-black text-[10px] uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-500/20"
+												className="px-7 py-3 rounded-2xl bg-emerald-600 text-white font-black text-[10px] uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-500/20 cursor-pointer"
 											>
 												Approve Result
 											</button>
@@ -167,13 +164,13 @@ export default function HeadReportsClient({ initialReports, filter }: { initialR
 											<>
 												<button
 													onClick={() => handleActionInitiate(report.id, "RETURN_TO_TESTING")}
-													className="px-5 py-3 rounded-2xl bg-amber-50 text-amber-700 font-black text-[10px] uppercase tracking-widest border border-amber-200 hover:bg-amber-100 transition-all shadow-sm"
+													className="px-5 py-3 rounded-2xl bg-amber-50 text-amber-700 font-black text-[10px] uppercase tracking-widest border border-amber-200 hover:bg-amber-100 transition-all shadow-sm cursor-pointer"
 												>
 													Return to Testing
 												</button>
 												<button
 													onClick={() => handleActionInitiate(report.id, "REJECT_TO_REQUESTER")}
-													className="px-5 py-3 rounded-2xl bg-rose-50 text-rose-700 font-black text-[10px] uppercase tracking-widest border border-rose-200 hover:bg-rose-100 transition-all shadow-sm"
+													className="px-5 py-3 rounded-2xl bg-rose-50 text-rose-700 font-black text-[10px] uppercase tracking-widest border border-rose-200 hover:bg-rose-100 transition-all shadow-sm cursor-pointer"
 												>
 													Reject to Requester
 												</button>
@@ -208,12 +205,12 @@ export default function HeadReportsClient({ initialReports, filter }: { initialR
 				</div>
 			</div>
 
-			{/* Approved Reports Section (List Style) */}
-			{filter !== "failed" && finalizedReports.length > 0 && (
+			{/* Finalized Reports Section (List Style) */}
+			{finalizedReports.length > 0 && (
 				<div className="mt-16 animate-in slide-in-from-bottom-8 duration-700">
 					<div className="flex items-center gap-4 mb-8">
 						<div className="h-px flex-1 bg-slate-100" />
-						<span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Finalized & Approved Reports ({finalizedReports.length})</span>
+						<span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Finalized Decisions ({finalizedReports.length})</span>
 						<div className="h-px flex-1 bg-slate-100" />
 					</div>
 
@@ -224,6 +221,7 @@ export default function HeadReportsClient({ initialReports, filter }: { initialR
 									<th className="px-8 py-5">Test Protocol</th>
 									<th className="px-8 py-5">Duration</th>
 									<th className="px-8 py-5">Stations</th>
+									<th className="px-8 py-5">Decision</th>
 									<th className="px-8 py-5 text-right">Actions</th>
 								</tr>
 							</thead>
@@ -243,15 +241,28 @@ export default function HeadReportsClient({ initialReports, filter }: { initialR
 											<p className="text-[9px] font-bold text-slate-400 uppercase mt-0.5">{report.numDays} Days</p>
 										</td>
 										<td className="px-8 py-5">
-											<span className="text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">
+											<span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg whitespace-nowrap">
 												{report.stationIds || "All"}
+											</span>
+										</td>
+										<td className="px-8 py-5">
+											<span className={`text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest whitespace-nowrap ${
+												(report.headDecision === "APPROVED" || report.status === "APPROVED") ? "bg-emerald-100 text-emerald-700" :
+												(report.headDecision === "REJECTED_TO_REQUESTER" || report.status === "REJECTED") ? "bg-rose-100 text-rose-700" :
+												(report.headDecision === "RETURNED_FOR_TESTING" || report.retestFlag) ? "bg-amber-100 text-amber-700" :
+												"bg-slate-100 text-slate-700"
+											}`}>
+												{(report.headDecision === "APPROVED" || report.status === "APPROVED") ? "Approved" : 
+												 (report.headDecision === "REJECTED_TO_REQUESTER" || report.status === "REJECTED") ? "Reject to Requester" : 
+												 (report.headDecision === "RETURNED_FOR_TESTING" || report.retestFlag) ? "Returned for Testing" :
+												 report.headDecision || report.status}
 											</span>
 										</td>
 										<td className="px-8 py-5 text-right">
 											<a
 												href={`/api/reports/test-plan/${report.id}`}
 												target="_blank"
-												className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-[10px] font-black uppercase text-blue-600 hover:bg-blue-50 transition-all"
+												className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-[10px] font-black uppercase text-blue-600 hover:bg-blue-50 transition-all cursor-pointer"
 											>
 												<svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
 												PDF Report
@@ -300,14 +311,14 @@ export default function HeadReportsClient({ initialReports, filter }: { initialR
 							<button
 								onClick={() => setDecisionTarget(null)}
 								disabled={submitting}
-								className="flex-1 px-8 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest text-slate-400 hover:bg-slate-50 transition-all"
+								className="flex-1 px-8 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest text-slate-400 hover:bg-slate-50 transition-all cursor-pointer"
 							>
 								Cancel
 							</button>
 							<button
 								onClick={submitDecision}
 								disabled={submitting}
-								className={`flex-[2] px-8 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest text-white shadow-xl transition-all active:scale-95 disabled:opacity-50 ${decisionTarget.action === "APPROVE" ? "bg-emerald-600 shadow-emerald-500/20 hover:bg-emerald-700" :
+								className={`flex-[2] px-8 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest text-white shadow-xl transition-all active:scale-95 disabled:opacity-50 cursor-pointer ${decisionTarget.action === "APPROVE" ? "bg-emerald-600 shadow-emerald-500/20 hover:bg-emerald-700" :
 										decisionTarget.action === "RETURN_TO_TESTING" ? "bg-amber-600 shadow-amber-500/20 hover:bg-amber-700" :
 											"bg-rose-600 shadow-rose-500/20 hover:bg-rose-700"
 									}`}

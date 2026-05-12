@@ -142,6 +142,7 @@ model TestPlan {
   capaReports    CapaReport[]
 
   managerReviewed Boolean  @default(false)
+  headDecision    String?
   retestFlag      Boolean  @default(false)
   retestCount     Int      @default(0)
   createdAt      DateTime @default(now())

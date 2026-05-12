@@ -31,7 +31,7 @@ export default function Pagination({ totalItems, itemsPerPage, currentPage }: Pa
 					type="button"
 					disabled={currentPage === 1}
 					onClick={() => handlePageChange(currentPage - 1)}
-					className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-400 disabled:opacity-30 hover:bg-slate-50 transition-all shadow-sm active:scale-95"
+					className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-400 disabled:opacity-30 hover:bg-slate-50 transition-all shadow-sm active:scale-95 cursor-pointer"
 				>
 					<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
@@ -44,7 +44,7 @@ export default function Pagination({ totalItems, itemsPerPage, currentPage }: Pa
 							key={page}
 							type="button"
 							onClick={() => handlePageChange(page)}
-							className={`w-8 h-8 rounded-lg text-[10px] font-bold transition-all border shadow-sm active:scale-95 ${
+							className={`w-8 h-8 rounded-lg text-[10px] font-bold transition-all border shadow-sm active:scale-95 cursor-pointer ${
 								currentPage === page
 									? "bg-slate-900 border-slate-900 text-white"
 									: "bg-white border-slate-200 text-slate-400 hover:border-slate-300 hover:text-slate-600"
@@ -59,7 +59,7 @@ export default function Pagination({ totalItems, itemsPerPage, currentPage }: Pa
 					type="button"
 					disabled={currentPage === totalPages}
 					onClick={() => handlePageChange(currentPage + 1)}
-					className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-400 disabled:opacity-30 hover:bg-slate-50 transition-all shadow-sm active:scale-95"
+					className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-400 disabled:opacity-30 hover:bg-slate-50 transition-all shadow-sm active:scale-95 cursor-pointer"
 				>
 					<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />

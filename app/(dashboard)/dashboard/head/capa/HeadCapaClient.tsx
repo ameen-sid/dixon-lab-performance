@@ -113,7 +113,7 @@ export default function HeadCapaClient() {
 					{(filters.startDate || filters.endDate || filters.submitter) && (
 						<button 
 							onClick={() => setFilters({ startDate: "", endDate: "", submitter: "" })}
-							className="px-6 py-2 text-[10px] font-black text-rose-500 hover:bg-rose-50 rounded-xl transition-all uppercase tracking-widest"
+							className="px-6 py-2 text-[10px] font-black text-rose-500 hover:bg-rose-50 rounded-xl transition-all uppercase tracking-widest cursor-pointer"
 						>
 							Reset
 						</button>

@@ -53,14 +53,14 @@ export default function RequestActionButtons({ request }: { request: any }) {
 					<button
 						onClick={handleApprove}
 						disabled={loading}
-						className="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-600 text-xs font-bold hover:bg-emerald-100 transition-colors disabled:opacity-50"
+						className="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-600 text-xs font-bold hover:bg-emerald-100 transition-colors disabled:opacity-50 cursor-pointer"
 					>
 						Approve
 					</button>
 					<button
 						onClick={() => setIsRejecting(true)}
 						disabled={loading}
-						className="px-3 py-1.5 rounded-lg bg-red-50 text-red-600 text-xs font-bold hover:bg-red-100 transition-colors disabled:opacity-50"
+						className="px-3 py-1.5 rounded-lg bg-red-50 text-red-600 text-xs font-bold hover:bg-red-100 transition-colors disabled:opacity-50 cursor-pointer"
 					>
 						Reject
 					</button>
@@ -78,14 +78,14 @@ export default function RequestActionButtons({ request }: { request: any }) {
 						<button
 							onClick={handleReject}
 							disabled={loading}
-							className="px-3 py-1.5 rounded-lg bg-red-600 text-white text-[10px] font-bold hover:bg-red-700 transition-colors disabled:opacity-50"
+							className="px-3 py-1.5 rounded-lg bg-red-600 text-white text-[10px] font-bold hover:bg-red-700 transition-colors disabled:opacity-50 cursor-pointer"
 						>
 							Confirm Reject
 						</button>
 						<button
 							onClick={() => setIsRejecting(false)}
 							disabled={loading}
-							className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 text-[10px] font-bold hover:bg-slate-200 transition-colors disabled:opacity-50"
+							className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 text-[10px] font-bold hover:bg-slate-200 transition-colors disabled:opacity-50 cursor-pointer"
 						>
 							Cancel
 						</button>

@@ -14,17 +14,18 @@ export default async function HeadTestReports({ searchParams }: { searchParams: 
 	const filter = params.filter;
 
 	// Build the where clause for the database query
-	const where: any = {
-		managerReviewed: true,
-	};
-
+	const where: any = {};
 	if (filter === "failed") {
-		where.status = "FAILED";
+		where.OR = [
+			{ status: "FAILED", managerReviewed: true },
+			{ status: "REJECTED" },
+			{ headDecision: { in: ["REJECTED_TO_REQUESTER", "RETURNED_FOR_TESTING"] } }
+		];
 	} else {
-		// For completed reports, we show those pending approval, completed (from testing), or already approved
-		where.status = {
-			in: ["PENDING_APPROVAL", "COMPLETED", "APPROVED"]
-		};
+		where.OR = [
+			{ managerReviewed: true, status: { in: ["PENDING_APPROVAL", "COMPLETED", "APPROVED"] } },
+			{ headDecision: "APPROVED" }
+		];
 	}
 
 	// Fetch data directly from the database (Server Component optimization)

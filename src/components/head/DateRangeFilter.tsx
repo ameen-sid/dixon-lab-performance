@@ -41,7 +41,7 @@ export default function DateRangeFilter() {
 					type="date" 
 					value={fromDate}
 					onChange={(e) => setFromDate(e.target.value)}
-					className="bg-transparent text-[10px] font-bold text-slate-900 outline-none w-[100px]"
+					className="bg-transparent text-[10px] font-bold text-slate-900 outline-none w-[100px] cursor-pointer"
 				/>
 			</div>
 			<div className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 rounded-lg">
@@ -50,13 +50,13 @@ export default function DateRangeFilter() {
 					type="date" 
 					value={toDate}
 					onChange={(e) => setToDate(e.target.value)}
-					className="bg-transparent text-[10px] font-bold text-slate-900 outline-none w-[100px]"
+					className="bg-transparent text-[10px] font-bold text-slate-900 outline-none w-[100px] cursor-pointer"
 				/>
 			</div>
 			{(fromDate || toDate) && (
 				<button 
 					onClick={handleClear}
-					className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
+					className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
 					title="Clear Dates"
 				>
 					<svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

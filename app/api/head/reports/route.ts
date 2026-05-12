@@ -39,6 +39,7 @@ export async function PATCH(req: Request) {
 		if (action === "REJECT_TO_REQUESTER") {
 			updateData = { 
 				status: "REJECTED",
+				headDecision: "REJECTED_TO_REQUESTER",
 				remarks: remarks || undefined
 			};
 			if (requestId) {
@@ -50,6 +51,7 @@ export async function PATCH(req: Request) {
 		} else if (action === "RETURN_TO_TESTING") {
 			updateData = { 
 				status: "FAILED", 
+				headDecision: "RETURNED_FOR_TESTING",
 				managerReviewed: false,
 				retestFlag: true,
 				retestCount: { increment: 1 },
@@ -58,6 +60,7 @@ export async function PATCH(req: Request) {
 		} else if (action === "APPROVE") {
 			updateData = { 
 				status: "APPROVED",
+				headDecision: "APPROVED",
 				remarks: remarks || undefined
 			};
 			if (requestId) {
