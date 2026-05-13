@@ -5,6 +5,7 @@ import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area
 } from 'recharts';
 import { Activity, ShieldCheck, FlaskConical, CheckCircle, Calendar, Filter, ChevronDown, Clock, Monitor } from 'lucide-react';
+import Image from 'next/image';
 
 // Mock Data organized by Month and Week
 const monthlyData = {
@@ -225,11 +226,22 @@ export default function CeoDashboard() {
   return (
     <div className="space-y-8 pb-12 animate-in fade-in duration-700">
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Executive Dashboard</h1>
-          <p className="text-slate-500 text-sm font-medium mt-1">
-            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
-          </p>
+        <div className="flex items-center gap-5">
+          <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 transition-all hover:shadow-md flex items-center justify-center min-w-[220px] h-24">
+            <Image 
+              src="/logo.png" 
+              alt="Dixon Logo" 
+              width={180} 
+              height={60} 
+              className="object-contain"
+            />
+          </div>
+          <div>
+            <h1 className="text-3xl font-black text-slate-900 tracking-tight">Executive Dashboard</h1>
+            <p className="text-slate-500 text-sm font-medium mt-1">
+              {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+            </p>
+          </div>
         </div>
         
         <div className="flex flex-wrap items-center gap-4 w-full md:w-auto md:justify-end">
