@@ -423,6 +423,14 @@ function PageTitle() {
 	const searchParams = useSearchParams();
 	const currentFull = pathname + (searchParams.toString() ? "?" + searchParams.toString() : "");
 
+	if (pathname === "/dashboard/ceo") {
+		return (
+			<div className="flex items-center py-1">
+				<img src="/logo.png" alt="Dixon Logo" className="h-10 w-auto object-contain" />
+			</div>
+		);
+	}
+
 	const titleMap: Record<string, string> = {
 		"/dashboard": "Dashboard Overview",
 		"/dashboard/requester": "Requester Dashboard",
